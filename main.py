@@ -1,6 +1,8 @@
 import __builtin__ as builtins
 from panda3d.core import loadPrcFileData
 loadPrcFileData("", "window-type none")
+loadPrcFileData("", "sync-video 0")
+loadPrcFileData("", "framebuffer-srgb true")
 from direct.showbase.AppRunnerGlobal import appRunner
 if appRunner: #run from binary/p3d
     path=appRunner.p3dFilename.getDirname()+'/'
@@ -22,6 +24,13 @@ class App():
         base = ShowBase.ShowBase()        
         #make the path a builtin
         builtins.path=path
+        
+        cfg={'simple-shaders':False,
+             'shadow-size':1024,
+             'shadow-area':400,
+             'srgb':True,
+             'hardware-skinning':True }
+        builtins.cfg=cfg
         
         self.info_level=DEBUG
         

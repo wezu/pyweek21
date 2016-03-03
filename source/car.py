@@ -3,6 +3,7 @@ from direct.showbase.InputStateGlobal import inputState
 from direct.interval.IntervalGlobal import *
 from panda3d.core import *
 from panda3d.bullet import *
+from toolkit import *
 
 class Car():
     def __init__(self,
@@ -15,7 +16,9 @@ class Car():
                 wheel='models/wheel1',
                 wheel_pos=[Point3(0.35, 0.83, 0.35),Point3(-0.35, 0.83, 0.35),Point3( 0.35, -0.32, 0.35),Point3(-0.35, -0.32, 0.35)],
                 ):
-        self.mass=mass            
+        self.mass=mass  
+        self.worldNP=worldNP
+        self.world=world
         # Chassis
         shape = BulletBoxShape(box)        
         ts = TransformState.makePos(shape_offset)
@@ -32,36 +35,27 @@ class Car():
         self.vehicle = BulletVehicle(world, self.node.node())
         self.vehicle.setCoordinateSystem(ZUp)
         world.attach(self.vehicle)
-
+        
+        #visible part
         self.model = loader.loadModel(chassis)
         self.model.reparentTo(self.node)
-
+        self.model.setShader(Shader.load(Shader.SLGLSL, 'shaders/default_v.glsl', 'shaders/default_f.glsl'))
+        if cfg['srgb']: fixSrgbTextures(self.model)
+        
         # Right front wheel
-        np = loader.loadModel(wheel)
-        np.reparentTo(worldNP)
-        self.addWheel(wheel_pos[0], True, np)
-
+        self.addWheel(wheel_pos[0], True, wheel)
         # Left front wheel
-        np = loader.loadModel(wheel)
-        np.reparentTo(worldNP)
-        self.addWheel(wheel_pos[1], True, np)
-
+        self.addWheel(wheel_pos[1], True, wheel)
         # Right rear wheel
-        np = loader.loadModel(wheel)
-        np.reparentTo(worldNP)
-        self.addWheel(wheel_pos[2], False, np)
-
+        self.addWheel(wheel_pos[2], False, wheel)
         # Left rear wheel
-        np = loader.loadModel(wheel)
-        np.reparentTo(worldNP)
-        self.addWheel(wheel_pos[3], False, np)
+        self.addWheel(wheel_pos[3], False, wheel)
 
         # Steering info
         self.steering = 0.0           
         self.engine_force=0.0
         self.steering_clamp = 30.0      
-        self.steering_increment = 0.6 
-                
+        self.steering_increment = 0.6                 
     
         #sfx
         self.sfx={}
@@ -71,7 +65,17 @@ class Car():
         self.sfx['skid']=loader.loadSfx("sfx/break3.ogg")
         self.sfx['skid_start']=loader.loadSfx("sfx/break_start.ogg")
         self.sfx['engine_start']=loader.loadSfx("sfx/engine_start.ogg")
-    
+        self.sfx['springs']=loader.loadSfx("sfx/springs.ogg")
+        #self.sfx['crash1']=loader.loadSfx("sfx/crash1.ogg")
+        #self.sfx['crash2']=loader.loadSfx("sfx/crash2.ogg")
+        #self.sfx['crash3']=loader.loadSfx("sfx/crash3.ogg")
+        #self.sfx['crash4']=loader.loadSfx("sfx/crash4.ogg")
+        self.sfx['crash5']=loader.loadSfx("sfx/crash5.ogg")
+        self.sfx['crash6']=loader.loadSfx("sfx/crash6.ogg")
+                
+        for sound in self.sfx:            
+            self.sfx[sound].setVolume(0.5)
+            
         self.isEngineRunning=False
         
     def isSfxPlaying(self, name):
@@ -87,6 +91,22 @@ class Car():
     def stopSfx(self, name):
         self.sfx[name].stop()
     
+    def setHandBreak(self):
+        #this work's not! (???)
+        self.brake_force=10000.0
+        self.engine_force=0.0
+        self.vehicle.setBrake(self.brake_force, 0)
+        self.vehicle.setBrake(self.brake_force, 1)
+        self.vehicle.setBrake(self.brake_force, 2)
+        self.vehicle.setBrake(self.brake_force, 3)
+        self.vehicle.applyEngineForce(self.engine_force, 0)
+        self.vehicle.applyEngineForce(self.engine_force, 1)
+        # Apply engine and brake to rear wheels
+        self.vehicle.applyEngineForce(self.engine_force, 2)
+        self.vehicle.applyEngineForce(self.engine_force, 3)
+        self.vehicle.setSteeringValue(0.0, 0)
+        self.vehicle.setSteeringValue(0.0, 1)
+        
     def _setEngineRunning(self, value):
         self.isEngineRunning=value
         if value==True:
@@ -119,7 +139,11 @@ class Car():
             return True
         return False    
         
-    def addWheel(self, pos, front, np):
+    def addWheel(self, pos, front, model):
+        np = loader.loadModel(model)
+        np.reparentTo(self.worldNP)
+        if cfg['srgb']: fixSrgbTextures(np)
+        np.setShader(Shader.load(Shader.SLGLSL, 'shaders/default_v.glsl', 'shaders/default_f.glsl'))
         wheel = self.vehicle.createWheel()
         wheel.setNode(np.node())
         wheel.setChassisConnectionPointCs(pos)
@@ -135,14 +159,25 @@ class Car():
         wheel.setRollInfluence(0.01)
     
     def drive(self, dt):
-        is_trurning=False        
+        is_trurning=False          
+        suspension_force=0
+        rate=1.0
+        for wheel in self.vehicle.getWheels():
+            suspension_force+=wheel.getWheelsSuspensionForce()         
+        if suspension_force == float('Inf'):
+            suspension_force=0.0    
+        if suspension_force>4000:
+            self.playSfx('springs',rate)
+        if suspension_force>5000:
+            self.playSfx('crash6',rate)
+        if suspension_force>8000:
+            self.playSfx('crash5',rate)              
         speed_coef=max(1.0,(100.0-self.vehicle.getCurrentSpeedKmHour()))
         
         if inputState.isSet('forward'):
             if not self.isEngineRunning:
                 self.startEngine()
-                return
-            
+                return            
             if self.engine_force == 0.0:
                 self.playSfx('brum')
             self.engine_force=speed_coef*1000.0*dt          
@@ -168,18 +203,15 @@ class Car():
         else:
             self.brake_force = 0.0
             if self.isSfxPlaying('skid') :
-                self.stopSfx('skid')
-            
+                self.stopSfx('skid')            
         if inputState.isSet('turnLeft'):
             self.steering += dt * self.steering_increment*(speed_coef+10.0)
             self.steering = min(self.steering, self.steering_clamp)
             is_trurning=True
-
         if inputState.isSet('turnRight'):
             self.steering -= dt * self.steering_increment*(speed_coef+10.0)
             self.steering = max(self.steering, -self.steering_clamp)
-            is_trurning=True
-          
+            is_trurning=True          
         if not is_trurning:
             if abs(self.steering) >0:
                 self.steering*=0.8            
@@ -191,7 +223,9 @@ class Car():
             rpm=0.0
         if rpm<0.0:
             rpm=0.0
-        self.sfx['engine'].setPlayRate(0.8+rpm*0.4)        
+        rpm*=rpm     
+        self.sfx['engine'].setPlayRate(0.8+rpm)        
+        self.sfx['engine'].setVolume(0.3+rpm)
         
         # Apply steering to front wheels
         self.vehicle.setSteeringValue(self.steering, 0)

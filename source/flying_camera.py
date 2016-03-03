@@ -11,7 +11,7 @@ class FlyingCamera():
         base.cam.setPos(offset)
         base.cam.setP(angle)
         
-    def follow(self, target, dt):
+    def follow(self, target, dt, speed):
         self.cam_node.setPos(target.getPos(render))        
         orig_H = self.cam_node.getH(render)
         target_H = target.getH(render)
@@ -25,7 +25,7 @@ class FlyingCamera():
             return
         # Figure out how far we should rotate in this frame, based on the
         # distance to go, and the speed we should move each frame.
-        t = dt * delta *0.3
+        t = dt * delta *speed
         # If we reach the target, stop there.
         t = min(t, 1.0)
         new_H = orig_H + (target_H - orig_H) * t

@@ -1,38 +1,63 @@
 from panda3d.core import *
 from direct.showbase.InputStateGlobal import inputState
 from panda3d.bullet import *
+from direct.actor.Actor import Actor
+from toolkit import *
 
 class Character():
     def __init__(self, world, worldNP):
          
-        height = 0.7
-        radius = 0.1
-        shape = BulletCapsuleShape(radius, height - 2*radius, ZUp)
+        #height = 0.7
+        #radius = 0.1
+        #shape = BulletCapsuleShape(radius, height - 2*radius, ZUp)
  
-        self.controler = BulletCharacterControllerNode(shape, 0.4, 'Player')
-        self.controler.setMaxJumpHeight(50.0)
-        self.controler.setJumpSpeed(5.0)
-        self.controler.setUseGhostSweepTest(True)
+        #self.controler = BulletCharacterControllerNode(shape, 10.0, 'rocket')
+        #self.controler.setMaxSlope(50.0) 
+        #self.controler.setMaxJumpHeight(50.0)
+        #self.controler.setJumpSpeed(5.0)
+        #self.controler.setUseGhostSweepTest(True)
         #self.controler.setFallSpeed(0.5)
-        playerNP = worldNP.attachNewNode(self.controler)
-        playerNP.setCollideMask(BitMask32.allOn()) 
-        world.attach(playerNP.node()) 
+        #playerNP = worldNP.attachNewNode(self.controler)
+        #playerNP.setCollideMask(BitMask32.allOn()) 
+        #world.attach(playerNP.node()) 
+        radius = 0.3
+        shape = BulletSphereShape(radius)
+        self.node = worldNP.attachNewNode(BulletRigidBodyNode('Sphere'))
+        self.node.node().setMass(50.0)
+        self.node.node().addShape(shape)        
+        self.node.setCollideMask(BitMask32.allOn())
+        self.node.node().setFriction(1.0)
+        self.node.node().setAngularDamping(0.999)
+        #self.node.node().setLinearDamping(0.5)
+        self.node.node().setDeactivationEnabled(False)
+        world.attachRigidBody(self.node.node())
     
-        self.model=loader.loadModel("models/rocket")
-        self.model.reparentTo(playerNP)
-        self.model.setH(180)
-        self.model.setZ(-height/2.0)
-        self.model.setScale(0.0128)
-    
-        self.node=playerNP
+        self.actor_node =render.attachNewNode('actor_node')    
+        self.actor=Actor(path+'models/m_rocket',
+                        {'walk':path+'models/a_rocket_walk1'}) 
+        self.actor.loop("walk")                 
+        self.actor.setScale(0.0128)
+        self.actor.setH(180)
+        self.actor.setZ(-radius)
+        self.actor.reparentTo(self.actor_node)  
+        self.actor.setBlend(frameBlend = True)
+        if cfg['hardware-skinning']:  
+            attr = ShaderAttrib.make(Shader.load(Shader.SLGLSL, 'shaders/actor_v.glsl', 'shaders/default_f.glsl'))
+            attr = attr.setFlag(ShaderAttrib.F_hardware_skinning, True)
+            self.actor.setAttrib(attr)
+        else:              
+            self.actor.setShader(Shader.load(Shader.SLGLSL, 'shaders/default_v.glsl', 'shaders/default_f.glsl'))
+        if cfg['srgb']: fixSrgbTextures(self.actor)
+            
         self.world=world
+        self.physic_node=self.node.node()
         
     def hide(self):
-        self.model.hide()
+        self.actor.hide()
         self.world.remove(self.node.node())
     
     def show(self):
-        self.model.hide()
+        self.actor.hide()
         self.world.attach(self.node.node())
          
         
@@ -44,26 +69,35 @@ class Character():
             self.node.setPos(render, pos)
         elif len(pos)>2:        
             self.node.setPos(render, Vec3(pos[0],pos[1],pos[2]))
+        self.actor_node.setPos(self.node.getPos(render))
             
     def jump(self):
-        self.controler.doJump()  
+        if self.world.contactTest(self.physic_node).getNumContacts()>0: 
+            force = self.actor_node.getRelativeVector(render, self.physic_node.getLinearVelocity())*1000.0 
+            #print force
+            force += Vec3(0, 0, 30000.0)
+            force = render.getRelativeVector(self.actor_node, force)
+            self.physic_node.applyCentralForce(force)
         
     def walk(self, dt):
-        speed = Vec3(0, 0, 0)
-        omega = 0.0
-        
-        v = 1.5        
-        if inputState.isSet('run'): v = 2.5
-        
-        if inputState.isSet('forward'): speed.setY(v)
-        if inputState.isSet('reverse'): speed.setY(-v)
-        if inputState.isSet('left'):    speed.setX(-v)
-        if inputState.isSet('right'):   speed.setX(v)
-        
-        if inputState.isSet('turnLeft'):  omega =  120.0
-        if inputState.isSet('turnRight'): omega = -120.0
+        self.actor_node.setPos(self.node.getPos(render))
+        if self.world.contactTest(self.physic_node).getNumContacts()>0:
+            force = Vec3(0, 0, 0.0)             
+            #if inputState.isSet('run'): v = 75 *dt            
+            if inputState.isSet('forward'):
+                force.setY(50000.0*dt)        
+            if inputState.isSet('reverse'):
+                force.setY(-50000.0*dt)
+            if inputState.isSet('turnLeft'):
+                self.actor_node.setH(self.actor_node, 80.0*dt)
+            if inputState.isSet('turnRight'):
+                self.actor_node.setH(self.actor_node, -80.0*dt)
 
-        self.controler.setAngularMovement(omega)
-        self.controler.setLinearMovement(speed, True)  
-        #print self.controler.isOnGround()  
-        #self.controler.update()
+            if force.getY()==0.0:
+                self.physic_node.setLinearVelocity(self.physic_node.getLinearVelocity()*0.8)
+            
+            force = render.getRelativeVector(self.actor_node, force)    
+            self.physic_node.applyCentralForce(force)
+            
+        speed= self.actor_node.getRelativeVector(render, self.physic_node.getLinearVelocity())
+        self.actor.setPlayRate(speed.y,'walk')

@@ -2,12 +2,12 @@
 
 <Texture> Tex2 {
   "tex/tire_n.png"
-  <Scalar> format { rgb }
+  <Scalar> format { rgba }
   <Scalar> wrapu { repeat }
   <Scalar> wrapv { repeat }
   <Scalar> minfilter { linear_mipmap_linear }
   <Scalar> magfilter { linear }
-  <Scalar> envtype { normal }
+  <Scalar> envtype { normal_gloss }
 }
 <Texture> Tex1 {
   "tex/tire.png"

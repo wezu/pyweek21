@@ -10,6 +10,8 @@ from panda3d.bullet import *
 from car import Car
 from flying_camera import FlyingCamera
 from character import Character
+from sky import Sky
+from terrain import Terrain
 
 DRIVING=1
 WALKING=2
@@ -32,31 +34,6 @@ class Game(DirectObject):
         base.setFrameRateMeter(True)
         base.disableMouse()   
         
-        # Light
-        alight = AmbientLight('ambientLight')
-        alight.setColor(Vec4(0.5, 0.5, 0.5, 1))
-        alightNP = render.attachNewNode(alight)
-
-        dlight = DirectionalLight('directionalLight')
-        dlight.setDirection(Vec3(1, 1, -1))
-        dlight.setColor(Vec4(0.7, 0.7, 0.7, 1))
-        dlightNP = render.attachNewNode(dlight)
-
-        render.clearLight()
-        render.setLight(alightNP)
-        render.setLight(dlightNP)
-
-        cm = CardMaker("plane")
-        cm.setFrame(0, 512, 0, 512)
-        self.grid=render.attachNewNode(cm.generate())
-        self.grid.lookAt(0, 0, -1)
-        self.grid.setTexture(loader.loadTexture('grid.png'))
-        self.grid.setTransparency(TransparencyAttrib.MDual)
-        self.grid.setTexScale(TextureStage.getDefault(), 32, 32, 1)
-        self.grid.setZ(-1)
-        self.grid.setLightOff()
-        self.grid.setColor(0,0,0,0.5)
-
         self.mode=DRIVING
         
         # Input
@@ -70,11 +47,11 @@ class Game(DirectObject):
         self.accept('tab', self.changeMode)
 
         inputState.watchWithModifiers('forward', 'w')
-        inputState.watchWithModifiers('left', 'a')
+        inputState.watchWithModifiers('left', 'q')
         inputState.watchWithModifiers('reverse', 's')
-        inputState.watchWithModifiers('right', 'd')
-        inputState.watchWithModifiers('turnLeft', 'q')
-        inputState.watchWithModifiers('turnRight', 'e')
+        inputState.watchWithModifiers('right', 'e')
+        inputState.watchWithModifiers('turnLeft', 'a')
+        inputState.watchWithModifiers('turnRight', 'd')
 
         # Task
         taskMgr.add(self.update, 'updateWorld') 
@@ -115,12 +92,13 @@ class Game(DirectObject):
         if self.mode==DRIVING:
             self.car.drive(dt)
             node_to_follow=self.car.node
+            speed=0.3
         elif self.mode==WALKING:    
             self.char.walk(dt)
-            node_to_follow=self.char.node
-            
+            node_to_follow=self.char.actor_node
+            speed=0.03
         self.world.doPhysics(dt, 10, 0.001)
-        self.camera.follow(node_to_follow, dt)
+        self.camera.follow(node_to_follow, dt, speed)
         return task.cont
 
     def cleanup(self):
@@ -131,10 +109,9 @@ class Game(DirectObject):
         if self.mode==DRIVING:
             if self.car.stopEngine():
                 self.mode=WALKING
-                if self.char.node.node() not in self.world.getCharacters():
-                    self.world.attach(self.char.node.node())
         elif self.mode==WALKING:
             self.mode=DRIVING
+            #self.car.node.node().setMass(self.car.mass)
             
     def doFlip(self):
         if self.mode==DRIVING:
@@ -149,34 +126,48 @@ class Game(DirectObject):
 
         # World
         self.debugNP = self.worldNP.attachNewNode(BulletDebugNode('Debug'))
-        self.debugNP.show()
+        self.debugNP.hide()
 
         self.world = BulletWorld()
         self.world.setGravity(Vec3(0, 0, -9.81))
         self.world.setDebugNode(self.debugNP.node())
 
         # Plane
-        shape = BulletPlaneShape(Vec3(0, 0, 1), 0)
+        #shape = BulletPlaneShape(Vec3(0, 0, 1), 0)        
+        #mesh = BulletTriangleMesh()
+        #geomNodes = loader.loadModel('levels/test1/collision').findAllMatches('**/+GeomNode')
+        #geomNode = geomNodes.getPath(0).node()
+        #geom = geomNode.getGeom(0)
+        #mesh.addGeom(geom)
+        #shape = BulletTriangleMeshShape(mesh, dynamic=False, bvh=True )                
+        #np = self.worldNP.attachNewNode(BulletRigidBodyNode('Ground'))
+        #np.node().addShape(shape)
+        #np.setPos(0, 0, -1.0)
+        #np.setCollideMask(BitMask32.allOn())
+        #self.world.attachRigidBody(np.node())
 
-        np = self.worldNP.attachNewNode(BulletRigidBodyNode('Ground'))
-        np.node().addShape(shape)
-        np.setPos(0, 0, -1)
-        np.setCollideMask(BitMask32.allOn())
-
-        self.world.attachRigidBody(np.node())
-
+        #sky dome
+        self.sun_sky=Sky()
+        
+        #terrain
+        self.ground=Terrain(self.world, self.worldNP)        
+        self.ground.loadMesh(path+'levels/gandg/collision')
+        self.ground.setMaps(path+'levels/gandg/')        
+        self.ground.setTexturesByID(1, 1)
+        self.ground.setTexturesByID(2, 2)
+        self.ground.setTexturesByID(3, 3)
+        self.ground.setTexturesByID(4, 4)
+        self.ground.setTexturesByID(5, 5)
+        self.ground.setTexturesByID(6, 6)        
         # Car
         self.car=Car(self.world, self.worldNP)
-        #self.world.remove(self.car.vehicle)
-        #self.car.startEngine()    
+        self.car.setPos(256, 256, 40)
         #camera
         self.camera=FlyingCamera(offset=(0, -5, 1.8), angle=-10)
         
-        #car to character scale 0.0128
-        
-        self.char=Character(self.world, self.worldNP)
-        
-        self.char.setPos(10, 10, 0)
+        #car to character scale 0.0128        
+        self.char=Character(self.world, self.worldNP)        
+        self.char.setPos(256, 250, 40)
 
         
 
