@@ -1,12 +1,7 @@
 from panda3d.core import *
 
 class LightManager():
-    def __init__(self, max_lights=8, ambient=(0.1, 0.1, 0.1)): 
-        
-        spheremap=loader.loadTexture('data/spheremap2.png')
-        #spheremap.setFormat(Texture.F_srgb)
-        render.setShaderInput('spheremap',spheremap)
-        
+    def __init__(self, max_lights=8, ambient=(0.1, 0.1, 0.1)):        
         self.lights=[]
         #shader has a hardcoded limit of 100
         #but use more then 20 with care

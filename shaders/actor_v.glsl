@@ -5,17 +5,15 @@ uniform mat4 p3d_ModelViewMatrix;
 uniform mat4 p3d_ModelMatrix;
 //uniform mat4 p3d_ModelMatrixInverseTranspose;
 uniform mat4 tpose_model_to_world; //pre 1.10 cg-style input
-uniform vec4 fog;
+
 
 in vec3 p3d_Normal;
 in vec4 p3d_Vertex;
 in vec2 p3d_MultiTexCoord0;
 
 out vec3 normal;
-out float fog_factor;
 out vec4 world_pos;
 out vec2 uv;
-out vec4 vpos;
 
 in vec4 transform_weight;
 in uvec4 transform_index;
@@ -44,14 +42,7 @@ void main()
 
     uv=p3d_MultiTexCoord0;
     world_pos=p3d_ModelMatrix* p3d_Vertex; 
- 
-           
-    vpos = p3d_ModelViewMatrix * p3d_Vertex;       
     
-    float distToEdge=clamp(pow(distance(world_pos.xy, vec2(256.0, 256.0))*0.004, 8.0), 0.0, 1.0);
-    float distToCamera =clamp(-vpos.z*fog.a-0.5, 0.0, 1.0);
-    fog_factor=clamp(distToCamera+distToEdge, 0.0, 1.0);     
-
         
     // Calculate light-space clip position.
     vec4 pushed = p3d_Vertex + vec4(p3d_Normal * bias, 0.0);

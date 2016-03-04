@@ -1,5 +1,16 @@
 from panda3d.core import *
-
+def pos2d(x,y):
+    return Point3(x,0,-y)
+    
+def rec2d(width, height):
+    return (-width, 0, 0, height)
+    
+def resetPivot2d(frame):
+    size=frame['frameSize']    
+    frame.setPos(-size[0], 0, -size[3])        
+    frame.flattenLight()
+    frame.setTransparency(TransparencyAttrib.MAlpha)
+    
 def fixSrgbTextures(model):
     for tex_stage in model.findAllTextureStages():            
         tex=model.findTexture(tex_stage)

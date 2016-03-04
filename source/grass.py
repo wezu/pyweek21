@@ -1,5 +1,7 @@
 from panda3d.core import *
 
+MASK_SHADOW=BitMask32.bit(2)
+
 class Grass():
     def __init__(self):
         self.node=render.attachNewNode('grass')
@@ -10,43 +12,47 @@ class Grass():
         self.node.setBin("background", 11)
         self.node.hide(MASK_SHADOW)
 
-        grass_tex0=loader.loadTexture('grass/1.png')
+        grass_tex0=loader.loadTexture(path+'grass_tex/11.png')
         grass_tex0.setWrapU(Texture.WMClamp)
         grass_tex0.setWrapV(Texture.WMClamp)
         grass_tex0.setMinfilter(Texture.FTLinearMipmapLinear)
         grass_tex0.setMagfilter(Texture.FTLinear)
-
-        grass_tex1=loader.loadTexture('grass/2.png')
+        if cfg['srgb']: grass_tex0.setFormat(Texture.F_srgb_alpha)
+        
+        grass_tex1=loader.loadTexture(path+'grass_tex/12.png')
         grass_tex1.setWrapU(Texture.WMClamp)
         grass_tex1.setWrapV(Texture.WMClamp)
         grass_tex1.setMinfilter(Texture.FTLinearMipmapLinear)
         grass_tex1.setMagfilter(Texture.FTLinear)
-
-        grass_tex2=loader.loadTexture('grass/3.png')
+        if cfg['srgb']: grass_tex1.setFormat(Texture.F_srgb_alpha)
+        
+        grass_tex2=loader.loadTexture(path+'grass_tex/13.png')
         grass_tex2.setWrapU(Texture.WMClamp)
         grass_tex2.setWrapV(Texture.WMClamp)
         grass_tex2.setMinfilter(Texture.FTLinearMipmapLinear)
         grass_tex2.setMagfilter(Texture.FTLinear)
-
-        self.node.setTexture(self.node.findTextureStage('tex1'), grass_tex0, 1)
-        self.node.setTexture(self.node.findTextureStage('tex2'), grass_tex1, 1)
-        self.node.setTexture(self.node.findTextureStage('tex3'), grass_tex2, 1)
+        if cfg['srgb']: grass_tex2.setFormat(Texture.F_srgb_alpha)
+        
+        
+        self.node.setShaderInput('tex1', grass_tex0)
+        self.node.setShaderInput('tex2', grass_tex1)
+        self.node.setShaderInput('tex3', grass_tex2)       
         
         #make the ping-pong buffer
-        shader1=Shader.load(Shader.SL_GLSL,'v.glsl', 'make_wave_f.glsl')
-        shader2=Shader.load(Shader.SL_GLSL,'v.glsl', 'make_wave2_f.glsl')        
-        self.ping=self.makeBuffer(shader1, size)
-        self.pong=self.makeBuffer(shader2, size)
-        self.ping['quad'].setShaderInput("size",float(size))
-        self.pong['quad'].setShaderInput("size",float(size))        
-        self.ping['quad'].setTexture(self.pong['tex'])
-        self.pong['quad'].setTexture(self.ping['tex'])        
-        self.ping['quad'].setShaderInput('startmap', self.wave_source['tex'])        
-        self.ping['buff'].setActive(True)
-        self.pong['buff'].setActive(False)
+        #shader1=Shader.load(Shader.SL_GLSL,'v.glsl', 'make_wave_f.glsl')
+        #shader2=Shader.load(Shader.SL_GLSL,'v.glsl', 'make_wave2_f.glsl')        
+        #self.ping=self.makeBuffer(shader1, size)
+        #self.pong=self.makeBuffer(shader2, size)
+        #self.ping['quad'].setShaderInput("size",float(size))
+        #self.pong['quad'].setShaderInput("size",float(size))        
+        #self.ping['quad'].setTexture(self.pong['tex'])
+        #self.pong['quad'].setTexture(self.ping['tex'])        
+        #self.ping['quad'].setShaderInput('startmap', self.wave_source['tex'])        
+        #self.ping['buff'].setActive(True)
+        #self.pong['buff'].setActive(False)
 
         #update task
-        taskMgr.add(self.update, 'update') 
+        #taskMgr.add(self.update, 'update') 
         
     def update(self, task):        
         dt=globalClock.getDt()
@@ -97,33 +103,24 @@ class Grass():
             ShaderAttrib.make(shader)  
             quad.setAttrib(ShaderAttrib.make(shader))
         #return all the data in a dict
-        return{'root':root, 'tex':tex, 'buff':buff, "cam":cam, 'quad':quad}
-    
-    def setTex(self, texture, stage):
-        stage_name='Tex'+str(stage+1)
-        grass_tex=loader.loadTexture(path+'grass/'+texture)
-        grass_tex.setWrapU(Texture.WMClamp)
-        grass_tex.setWrapV(Texture.WMClamp)
-        grass_tex.setMinfilter(Texture.FTLinearMipmapLinear)
-        grass_tex.setMagfilter(Texture.FTLinear)
-        self.node.setTexture(self.node.findTextureStage(stage_name), grass_tex, 1)
-
+        return{'root':root, 'tex':tex, 'buff':buff, "cam":cam, 'quad':quad}    
+   
     def setGrassMap(self, texture):
         pass
 
     def createGrassTile(self, uv_offset, pos, parent, fogcenter=Vec3(0,0,0), count=256):
-        grass=loader.loadModel(path+"data/grass_patch")
+        grass=loader.loadModel(path+"data/grass_tiny")
         #grass.setTwoSided(True)
         grass.setTransparency(TransparencyAttrib.MBinary, 1)
         grass.reparentTo(parent)
         grass.setInstanceCount(count)
         grass.node().setBounds(BoundingBox((0,0,0), (256,256,128)))
-        grass.node().setFinal(1)
-        grass.setShader(Shader.load(Shader.SLGLSL, cfg["shader_grass_v"], cfg["shader_grass_f"]))
-        #grass.setShader(Shader.load(Shader.SLGLSL, "shaders/grass_v.glsl", "shaders/grass_f.glsl"))
-        grass.setShaderInput('height', self.painter.textures[BUFFER_HEIGHT])
-        grass.setShaderInput('grass', self.painter.textures[BUFFER_GRASS])
+        grass.node().setFinal(1)        
+        grass.setShader(Shader.load(Shader.SLGLSL, path+"shaders/grass_v.glsl", path+"shaders/grass_f.glsl"))
+        grass.setShaderInput('grass', loader.loadTexture(path+'data/red.png'))
         grass.setShaderInput('uv_offset', uv_offset)
         grass.setShaderInput('fogcenter', fogcenter)
+        grass.setShaderInput('pos', pos)
+        render.setShaderInput('pc_pos', Vec3(0,0,0))
         grass.setPos(pos)
         return grass

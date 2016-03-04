@@ -23,17 +23,11 @@ uniform sampler2D height; // a heightmap
 //uniform vec4 fog; //fog color + for adjust in alpha
 uniform vec3 ambient; //ambient light color
 
-uniform vec4 p3d_ClipPlane[1];
-
-uniform float water_level;
 uniform float z_scale;
 
 uniform vec3 camera_pos;
-
-in float fog_factor; 
 in vec2 texUV; 
 in vec2 texUVrepeat;
-in vec4 vpos;
 in vec4 world_pos;
 
 in vec4 shadowCoord;
@@ -45,11 +39,9 @@ uniform int num_lights;
 
 void main()
     { 
-    vec4 fog_color=vec4(fog.rgb, 1.0);
-    if (dot(p3d_ClipPlane[0], vpos) < 0.0) 
-        {
-        discard;
-        }          
+    float fog_factor=distance(world_pos.xyz,camera_pos)*0.01;      
+    fog_factor=clamp(pow(fog_factor, 2.0), 0.0, 1.0);    
+    vec4 fog_color=vec4(fog.rgb, 1.0);       
     //vec4 fog_color=vec4(fog.rgb, 0.0);        
     if(fog_factor>0.996)//fog only version
         {
@@ -143,7 +135,7 @@ void main()
         if (shadowColor < shadowUV.z-0.001)
             shade=fog_factor;                    
         specular=specular*(1.0-fog_factor)*0.2;                
-        gl_FragData[0] = mix(final, fog_color ,fog_factor*fog_factor);                
+        gl_FragData[0] = mix(final, fog_color ,fog_factor);                
         //gl_FragData[0]=vec4(color.rgb, 1.0);
         //gl_FragData[0] = vec4(fog_color.rgb, 1.0);                
         //gl_FragData[1]=vec4(fog_factor, shade, shade*specular,0.0);       

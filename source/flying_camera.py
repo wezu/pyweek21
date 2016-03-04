@@ -4,12 +4,23 @@ from panda3d.core import *
 
 
 class FlyingCamera():
-    def __init__(self, offset=(0, -5, 1.8), angle=-10):
+    def __init__(self, offset=(0, -5, 2), angle=-15):
         #camera
         self.cam_node=render.attachNewNode("cam_node")
         base.cam.reparentTo(self.cam_node)
         base.cam.setPos(offset)
         base.cam.setP(angle)
+    
+    def _zoom(self, t):        
+        base.cam.setY(base.cam.getY()+t)
+        base.cam.setP(base.cam.getP()+t*3.0)
+        base.cam.setZ(render, base.cam.getZ(render)-t*0.5)
+        
+    def zoomIn(self):
+        LerpFunc(self._zoom,fromData=0,toData=0.04, duration=1.0, blendType='easeOut').start()    
+        
+    def zoomOut(self):        
+        LerpFunc(self._zoom,fromData=0,toData=-0.04, duration=1.0, blendType='easeOut').start()    
         
     def follow(self, target, dt, speed):
         self.cam_node.setPos(target.getPos(render))        

@@ -42,6 +42,14 @@ class Car():
         self.model.setShader(Shader.load(Shader.SLGLSL, 'shaders/default_v.glsl', 'shaders/default_f.glsl'))
         if cfg['srgb']: fixSrgbTextures(self.model)
         
+        self.blade=loader.loadModel(path+'models/blade')
+        self.blade. reparentTo(self.model)
+        self.blade.setPos(0, -0.924, 0.089)
+        if cfg['srgb']: fixSrgbTextures(self.blade)
+        
+        self.blade_spining=False
+        self.fuel=100.0
+        
         # Right front wheel
         self.addWheel(wheel_pos[0], True, wheel)
         # Left front wheel
@@ -72,6 +80,9 @@ class Car():
         #self.sfx['crash4']=loader.loadSfx("sfx/crash4.ogg")
         self.sfx['crash5']=loader.loadSfx("sfx/crash5.ogg")
         self.sfx['crash6']=loader.loadSfx("sfx/crash6.ogg")
+        self.sfx['choke']=loader.loadSfx("sfx/choke.ogg")
+        self.sfx['mower']=loader.loadSfx("sfx/mower.ogg")
+        self.sfx['mower'].setLoop(True)
                 
         for sound in self.sfx:            
             self.sfx[sound].setVolume(0.5)
@@ -118,6 +129,8 @@ class Car():
             self.vehicle.setBrake(self.brake_force, 3)
         
     def startEngine(self):
+        if self.fuel<0.0:
+            self.playSfx('choke')
         if not self.isSfxPlaying('engine_start'):
             Sequence(
                     Func(self.sfx['engine_start'].play),
@@ -158,10 +171,33 @@ class Car():
         wheel.setFrictionSlip(150.0); #max 5.0 min 1.2
         wheel.setRollInfluence(0.01)
     
-    def drive(self, dt):
-        is_trurning=False          
+    
+    def outOfFuel(self):
+        self.sfx['engine'].stop() 
+        self.sfx['mower'].stop()       
+        self.isEngineRunning=False
+        self.blade_spining=False
+        self.vehicle.setBrake(5.0, 2)
+        self.vehicle.setBrake(5.0, 3)
+        if self.fuel>-1.0:
+            self.playSfx('choke')
+            self.fuel=-2.0
+        
+    def drive(self, dt):  
+        
+        if self.fuel<0.0:
+            self.outOfFuel()
+            return
+            
+        is_trurning=False                  
         suspension_force=0
         rate=1.0
+        if self.blade_spining:
+            self.blade.setH(self.blade.getH()+dt*1500.0)
+            self.playSfx('mower')
+            self.fuel-=dt
+        else:
+            self.stopSfx('mower')   
         for wheel in self.vehicle.getWheels():
             suspension_force+=wheel.getWheelsSuspensionForce()         
         if suspension_force == float('Inf'):
@@ -171,7 +207,8 @@ class Car():
         if suspension_force>5000:
             self.playSfx('crash6',rate)
         if suspension_force>8000:
-            self.playSfx('crash5',rate)              
+            self.playSfx('crash5',rate) 
+            self.blade_spining=False             
         speed_coef=max(1.0,(100.0-self.vehicle.getCurrentSpeedKmHour()))
         
         if inputState.isSet('forward'):
@@ -238,6 +275,7 @@ class Car():
         self.vehicle.applyEngineForce(self.engine_force, 3)        
         self.vehicle.setBrake(self.brake_force, 2)
         self.vehicle.setBrake(self.brake_force, 3)
+        self.fuel-=dt*self.engine_force*0.0001
         
     def setPos(self, *args):
         pos=[]
@@ -252,3 +290,6 @@ class Car():
         if abs(self.node.getR(render))>90.0 and self.vehicle.getCurrentSpeedKmHour() <= 1.0:
             self.node.setZ(self.node.getZ()+1.5)
             self.node.setR(render, 0.0)
+            
+    def getKmph(self):
+        return self.vehicle.getCurrentSpeedKmHour()

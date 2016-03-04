@@ -5,10 +5,8 @@ uniform vec4 light_pos[100];
 uniform int num_lights;
 uniform sampler2D p3d_Texture0; //rgba color texture 
 uniform sampler2D p3d_Texture1; //rgba normal+gloss texture 
-//uniform samplerCube cubemap;
 uniform vec3 camera_pos;
 uniform vec3 ambient;
-uniform vec4 p3d_ClipPlane[1];
 uniform vec4 fog;
 uniform vec4 skyColor;
 uniform vec4 cloudColor;
@@ -17,8 +15,6 @@ uniform vec4 cloudColor;
 in vec2 uv;
 in vec4 world_pos;
 in vec3 normal;
-in float fog_factor;
-in vec4 vpos;
 //in vec4 shadowCoord;
 //uniform sampler2D shadow;
 
@@ -56,10 +52,9 @@ vec3 perturb_normal( vec3 N, vec3 V, vec2 texcoord )
 
 void main()
     {    
-    if (dot(p3d_ClipPlane[0], vpos) < 0.0) 
-        {
-        discard;
-        }
+    float fog_factor=distance(world_pos.xyz,camera_pos)*0.01;        
+    fog_factor=clamp(pow(fog_factor, 2.0), 0.0, 1.0);
+    
     vec3 color=vec3(0.0, 0.0, 0.0);
     vec4 color_map=texture(p3d_Texture0,uv);
     float gloss=texture(p3d_Texture1,uv).a;
@@ -100,7 +95,7 @@ void main()
     //color+=(texture(cubemap, R.xzy).rgb)*gloss*3.0;
     vec4 final= vec4(color.rgb * color_map.xyz, color_map.a);
     //gl_FragData[0]= texture(cubemap, skyR.xzy);
-    gl_FragData[0] = mix(final ,fog_color, fog_factor*fog_factor);     
+    gl_FragData[0] = mix(final ,fog_color, fog_factor);     
     //shadows
     //vec4 shadowUV = shadowCoord / shadowCoord.q;
     //float shadowColor = texture(shadow, shadowUV.xy).r;    

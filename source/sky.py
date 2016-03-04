@@ -44,7 +44,7 @@ class Sky():
         self.sun_node.setPos(256, 256, 0)        
         self._makeShadowBuffer()
         
-        self.setTime(7.0)
+        self.setTime(12.0)
         
     def _makeShadowBuffer(self):
         hpr=(90, -90, 0)
@@ -136,7 +136,7 @@ class Sky():
         p1=self.skyimg.getPixel(x1, 3)
         p2=self.skyimg.getPixel(x2, 3)
         fog_color=self._blendPixels(p1, p2, blend)
-        fog_color[3]=(abs(sunpos)*0.1+0.01)
+        fog_color[3]=(abs(sunpos)*0.01+0.01)
 
         if time<6.0 or time>18.0:
             p=0.0

@@ -69,7 +69,7 @@ class Terrain():
             atr1=folder+'detail0.png'
             atr2=folder+'detail1.png'
         self.maps={'height':height, 'atr1':atr1, 'atr2':atr2}
-        self.mesh.setShaderInput("height",loader.loadTexture(height))
+        render.setShaderInput("height",loader.loadTexture(height))
         self.mesh.setShaderInput("atr1",loader.loadTexture(atr1))
         self.mesh.setShaderInput("atr2",loader.loadTexture(atr2))        
         self.mesh.setShader(Shader.load(Shader.SLGLSL, "shaders/terrain_v.glsl","shaders/terrain2_f.glsl"))        

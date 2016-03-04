@@ -12,7 +12,8 @@ from flying_camera import FlyingCamera
 from character import Character
 from sky import Sky
 from terrain import Terrain
-
+from grass import Grass
+from hud import HUD
 DRIVING=1
 WALKING=2
 
@@ -22,7 +23,7 @@ class Game(DirectObject):
         wp = WindowProperties.getDefault()                  
         wp.setUndecorated(False)          
         wp.setFullscreen(False)     
-        wp.setSize(800,600)   
+        wp.setSize(800, 600)   
         #these probably won't be in the config (?)
         wp.setOrigin(-2,-2)  
         wp.setFixedSize(False)  
@@ -45,7 +46,9 @@ class Game(DirectObject):
         self.accept('f5', self.doScreenshot)
         self.accept('space', self.doFlip)
         self.accept('tab', self.changeMode)
-
+        self.accept('shift', self.shear)
+        self.accept( 'window-event', self.onWindowEvent)
+        
         inputState.watchWithModifiers('forward', 'w')
         inputState.watchWithModifiers('left', 'q')
         inputState.watchWithModifiers('reverse', 's')
@@ -83,7 +86,12 @@ class Game(DirectObject):
 
     def doScreenshot(self):
         base.screenshot('Bullet')
-
+        
+    def onWindowEvent(self,window=None):
+        if window is not None: # window is none if panda3d is not started             
+            #self.filters.update()            
+            self.hud.updateGuiNodes() 
+            
   # ____TASK___
 
     def update(self, task):
@@ -91,6 +99,8 @@ class Game(DirectObject):
         
         if self.mode==DRIVING:
             self.car.drive(dt)
+            self.hud.showSpeed(self.car.getKmph())
+            self.hud.showFuel(self.car.fuel)
             node_to_follow=self.car.node
             speed=0.3
         elif self.mode==WALKING:    
@@ -109,8 +119,12 @@ class Game(DirectObject):
         if self.mode==DRIVING:
             if self.car.stopEngine():
                 self.mode=WALKING
+                self.camera.zoomIn()
+                self.hud.hide()
         elif self.mode==WALKING:
             self.mode=DRIVING
+            self.camera.zoomOut()
+            self.hud.show()
             #self.car.node.node().setMass(self.car.mass)
             
     def doFlip(self):
@@ -119,8 +133,14 @@ class Game(DirectObject):
         
         if self.mode==WALKING:
             self.char.jump()
-            
     
+    def shear(self):
+        if self.mode==DRIVING:
+            if self.car.blade_spining:
+                self.car.blade_spining=False
+            else:    
+                self.car.blade_spining=True
+                
     def setup(self):
         self.worldNP = render.attachNewNode('World')
 
@@ -148,27 +168,34 @@ class Game(DirectObject):
 
         #sky dome
         self.sun_sky=Sky()
+        self.sun_sky.setTime(16.0)
         
         #terrain
         self.ground=Terrain(self.world, self.worldNP)        
         self.ground.loadMesh(path+'levels/gandg/collision')
         self.ground.setMaps(path+'levels/gandg/')        
+        #TODO : this is stupid! |   |
+        #                      \|/ \|/
         self.ground.setTexturesByID(1, 1)
         self.ground.setTexturesByID(2, 2)
         self.ground.setTexturesByID(3, 3)
         self.ground.setTexturesByID(4, 4)
         self.ground.setTexturesByID(5, 5)
-        self.ground.setTexturesByID(6, 6)        
+        self.ground.setTexturesByID(6, 6)   
+        #grass
+        self.grass=Grass()
+             
         # Car
         self.car=Car(self.world, self.worldNP)
         self.car.setPos(256, 256, 40)
         #camera
-        self.camera=FlyingCamera(offset=(0, -5, 1.8), angle=-10)
+        self.camera=FlyingCamera()
         
         #car to character scale 0.0128        
         self.char=Character(self.world, self.worldNP)        
-        self.char.setPos(256, 250, 40)
-
+        self.char.setPos(256, 250, 80)
+        
+        self.hud=HUD()
         
 
 
