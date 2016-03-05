@@ -15,7 +15,7 @@ from terrain import Terrain
 from grass import Grass
 from hud import HUD
 from postprocess import Postprocess
-
+from toolkit import loadObject
 DRIVING=1
 WALKING=2
 EXITING=3
@@ -213,11 +213,11 @@ class Game(DirectObject):
         self.ground.setTexturesByID(5, 6)   
         #grass
         self.grass=Grass()
-        self.grass.setMap(path+'levels/gandg/grass.png')     
+        self.grass.setMap(path+'levels/gandg2/grass.png')     
         self.grass_to_cut=self.grass.getStatus()
         # Car
         self.car=Car(self.world, self.worldNP)
-        self.car.setPos(256, 256, 40)
+        self.car.setPos(161.0,160.0,26)
         #camera
         self.camera=FlyingCamera()
         
@@ -233,6 +233,78 @@ class Game(DirectObject):
         #self.filters.setupFilters()
         
         
+        #map objects .. hardcoded because of time
+        self.object_root=render.attachNewNode('object_root')
+        obj=[
+            (path+'models/pyweek_wall1',0.0,(303.0,405.0,25.0980415344238)),
+            (path+'models/pyweek_wall1',0.0,(301.0,405.0,25.0980434417725)),
+            (path+'models/pyweek_wall1',0.0,(299.0,405.0,25.0980415344238)),
+            (path+'models/pyweek_wall1',0.0,(297.0,405.0,25.0980415344238)),
+            (path+'models/pyweek_wall1',0.0,(295.0,405.0,25.0980415344238)),
+            (path+'models/pyweek_wall1',0.0,(293.0,405.0,25.0980434417725)),
+            (path+'models/pyweek_wall1',0.0,(291.0,405.0,25.0980415344238)),
+            (path+'models/pyweek_wall1',0.0,(289.0,405.0,25.0980415344238)),
+            (path+'models/pyweek_wall1',0.0,(287.0,405.0,25.0980415344238)),
+            (path+'models/pyweek_wall1',0.0,(285.0,405.0,25.0980415344238)),
+            (path+'models/pyweek_wall1',0.0,(283.0,405.0,25.0980415344238)),
+            (path+'models/pyweek_wall1',0.0,(281.0,405.0,25.0980415344238)),
+            (path+'models/pyweek_wall1',0.0,(281.0,385.0,25.0980415344238)),
+            (path+'models/pyweek_wall1',0.0,(283.0,385.0,25.0980453491211)),
+            (path+'models/pyweek_wall1',0.0,(285.0,385.0,25.0980415344238)),
+            (path+'models/pyweek_wall1',90.0,(304.0,404.0,25.0980415344238)),
+            (path+'models/pyweek_wall1',90.0,(304.0,402.0,25.0980415344238)),
+            (path+'models/pyweek_wall1',90.0,(304.0,400.0,25.0980415344238)),
+            (path+'models/pyweek_wall1',90.0,(304.0,398.0,25.0980415344238)),
+            (path+'models/pyweek_wall1',90.0,(304.0,396.0,25.0980415344238)),
+            (path+'models/pyweek_wall1',90.0,(304.0,394.0,25.0980415344238)),
+            (path+'models/pyweek_wall1',90.0,(304.0,392.0,25.237850189209)),
+            (path+'models/pyweek_wall1',90.0,(280.0,404.0,25.0980415344238)),
+            (path+'models/pyweek_wall1',90.0,(280.0,398.0,25.0980415344238)),
+            (path+'models/pyweek_wall1',90.0,(280.0,396.0,25.0980415344238)),
+            (path+'models/pyweek_wall1',90.0,(280.0,394.0,25.0980415344238)),
+            (path+'models/pyweek_wall1',90.0,(280.0,392.0,25.0980415344238)),
+            (path+'models/pyweek_wall1',90.0,(280.0,390.0,25.0980415344238)),
+            (path+'models/pyweek_wall1',90.0,(280.0,388.0,25.0980415344238)),
+            (path+'models/pyweek_wall1',90.0,(280.0,386.0,25.0980415344238)),
+            (path+'models/pyweek_wall1',90.0,(286.0,386.0,25.0980415344238)),
+            (path+'models/pyweek_wall1',90.0,(286.0,388.0,25.0980415344238)),
+            (path+'models/pyweek_wall1',90.0,(286.0,390.0,25.0980434417725)),
+            (path+'models/pyweek_wall1',0.0,(287.0,391.0,25.0980415344238)),
+            (path+'models/pyweek_wall1',0.0,(289.0,391.0,25.1190624237061)),
+            (path+'models/pyweek_wall1',0.0,(291.0,391.0,25.1960334777832)),
+            (path+'models/pyweek_wall1',0.0,(293.0,391.0,25.1596641540527)),
+            (path+'models/pyweek_wall1',0.0,(295.0,391.0,25.2697868347168)),
+            (path+'models/pyweek_wall1',0.0,(297.0,391.0,25.3282146453857)),
+            (path+'models/pyweek_wall1',0.0,(299.0,391.0,25.3496627807617)),
+            (path+'models/pyweek_wall1',0.0,(301.0,391.0,25.2688617706299)),
+            (path+'models/pyweek_wall1',0.0,(303.0,391.0,25.2534332275391)),
+            (path+'models/pyweek_box',0.0,(279.600006103516,401.700012207031,25.0980415344238)),
+            (path+'models/pyweek_box',0.0,(279.399993896484,402.200012207031,25.0980415344238)),
+            (path+'models/pyweek_box',0.0,(279.600006103516,402.700012207031,25.0980415344238)),
+            (path+'models/pyweek_box',0.0,(279.399993896484,403.399993896484,25.0980415344238)),
+            (path+'models/pyweek_box',0.0,(278.799987792969,402.799987792969,25.0980415344238)),
+            (path+'models/pyweek_box',0.0,(278.799987792969,402.100006103516,25.0980415344238)),
+            (path+'models/pyweek_box',0.0,(279.0,401.5,25.0980415344238)),
+            (path+'models/pyweek_box',0.0,(278.5,401.600006103516,25.0980415344238)),
+            (path+'models/pyweek_box',0.0,(278.799987792969,401.899993896484,25.5980415344238)),
+            (path+'models/pyweek_wall1',90.0,(280.0,402.0,25.0980415344238)),
+            (path+'models/pyweek_box',90.0,(279.5,402.600006103516,25.5980415344238)),
+            (path+'models/pyweek_box',90.0,(279.0,402.5,25.5980415344238)),
+            (path+'models/pyweek_box',90.0,(279.399993896484,402.0,25.5980415344238)),
+            (path+'models/pyweek_box',90.0,(278.100006103516,402.299987792969,25.0980415344238)),
+            (path+'models/pyweek_box',90.0,(277.799987792969,401.700012207031,25.0980415344238)),
+            (path+'models/pyweek_box',90.0,(278.200012207031,401.899993896484,25.5980415344238)),
+            (path+'models/pyweek_box',90.0,(279.399993896484,402.399993896484,26.0980415344238)),
+            (path+'models/pyweek_box',90.0,(279.0,401.899993896484,26.0980415344238)),
+            (path+'models/pyweek_box',90.0,(278.799987792969,402.399993896484,26.0980415344238))
+            ]
+        for i in obj:
+            loadObject(model=i[0], H=i[1], pos=i[2], world=self.world, worldNP=self.worldNP, root=self.object_root, collision_solid=None)
+        self.object_root.flattenStrong()
+        
+        #models/pyweek_gate,90.0,(280.0,399.0,25.0980415344238))
+        
+        #gui    
         self.hud=HUD()
         
 

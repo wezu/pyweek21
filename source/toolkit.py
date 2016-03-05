@@ -1,5 +1,33 @@
 from panda3d.core import *
+from panda3d.bullet import *
 
+
+def loadObject(model, H, pos, world, worldNP, root=render, collision_solid=None):
+    
+    new_model=loader.loadModel(model)
+    new_model.reparentTo(root)
+    new_model.setPos(render, pos)
+    new_model.setH(render, H) 
+    new_model.setShader(Shader.load(Shader.SLGLSL, path+'shaders/default_v.glsl', path+'shaders/default_f.glsl'))   
+    if collision_solid:
+        collision_mesh=loader.loadModel(collision)
+    else:
+        collision_mesh=loader.loadModel(model)    
+    collision_mesh.setPos(render, pos)
+    collision_mesh.setH(render, H)    
+    collision_mesh.flattenStrong()    
+    bullet_mesh = BulletTriangleMesh()
+    geomNodes = collision_mesh.findAllMatches('**/+GeomNode')
+    geomNode = geomNodes.getPath(0).node()
+    geom = geomNode.getGeom(0)
+    bullet_mesh.addGeom(geom)
+    shape = BulletTriangleMeshShape(bullet_mesh, dynamic=False, bvh=True ) 
+    collision = worldNP.attachNewNode(BulletRigidBodyNode('object'))
+    collision.node().addShape(shape)
+    collision.setCollideMask(BitMask32.allOn())
+    world.attachRigidBody(collision.node()) 
+    return (new_model, collision)
+    
 def tex(file_name, srgb=False):
     texture=loader.loadTexture(file_name)
     tex_format=texture.getFormat()
