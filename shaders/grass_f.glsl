@@ -4,6 +4,7 @@ uniform sampler2D tex1; //rgb color texture
 uniform sampler2D tex2; //rgb color texture
 uniform sampler2D tex3; //rgb color texture
 uniform sampler2D grass;
+uniform sampler2D cut;
 //uniform sampler2D p3d_Texture1; //normal map
 
 in vec2 uv;
@@ -23,6 +24,7 @@ uniform vec3 camera_pos;
 void main()
     {    
     vec4 blend_mask=texture(grass,uv);
+    blend_mask -=texture(cut,uv).r; 
     //if (lod_factor>0.7)
     //    discard; 
     if(dot(blend_mask.rgb, vec3(1.0, 1.0, 1.0)) < 0.1)        

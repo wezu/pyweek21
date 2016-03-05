@@ -1,5 +1,6 @@
 from panda3d.core import *
 from direct.showbase.InputStateGlobal import inputState
+from direct.interval.IntervalGlobal import *
 from panda3d.bullet import *
 from direct.actor.Actor import Actor
 from toolkit import *
@@ -24,6 +25,8 @@ class Character():
                         {'walk':path+'models/a_rocket_walk1',
                         'run':path+'models/a_rocket_run',
                         'recover':path+'models/a_rocket_recover',
+                        'drive':path+'models/a_rocket_drive',
+                        'exit':path+'models/a_rocket_exit',
                         'jump':path+'models/a_rocket_jump'}) 
         self.actor.loop('walk')                 
         self.actor.setScale(0.0128)
@@ -41,13 +44,32 @@ class Character():
             
         self.world=world
         self.physic_node=self.node.node()
+    
+    def enterCar(self):
+        self.hide()
+    
+    def _enableControl(self, node):
+        pos=node.getPos(render)
+        #pos[1]+=0.155712
+        pos[2]+=1.2
+        self.node.setPos(render, pos)     
+        self.actor.reparentTo(self.actor_node)    
+        self.actor.setZ(-0.31)    
+        self.world.attach(self.node.node())
+        self.physic_node.setLinearVelocity(Vec3(0,0,0))    
+    
+    def exitCar(self, node):        
+        pos=node.getPos(render)
+        pos[2]+=1
+        self.setPos(pos)
+        Sequence(Wait(3.5), Func(self.show)).start()
         
     def hide(self):
         self.actor.hide()
         self.world.remove(self.node.node())
     
     def show(self):
-        self.actor.hide()
+        self.actor.show()
         self.world.attach(self.node.node())
          
         
@@ -56,7 +78,7 @@ class Character():
         for arg in args:
             pos.append(arg)
         if len(pos)==1:                
-            self.node.setPos(render, pos)
+            self.node.setPos(render, pos[0])
         elif len(pos)>2:        
             self.node.setPos(render, Vec3(pos[0],pos[1],pos[2]))
         self.actor_node.setPos(self.node.getPos(render))
@@ -65,7 +87,7 @@ class Character():
         if self.world.contactTest(self.physic_node).getNumContacts()>0: 
             force = self.actor_node.getRelativeVector(render, self.physic_node.getLinearVelocity())*1000.0 
             #print force
-            force += Vec3(0, 0, 30000.0)
+            force += Vec3(0, 0, 20000.0)
             force = render.getRelativeVector(self.actor_node, force)
             self.physic_node.applyCentralForce(force)
             self.actor.play('jump')

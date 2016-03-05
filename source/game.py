@@ -16,6 +16,7 @@ from grass import Grass
 from hud import HUD
 DRIVING=1
 WALKING=2
+EXITING=3
 
 class Game(DirectObject):
     def __init__(self):      
@@ -58,6 +59,7 @@ class Game(DirectObject):
 
         # Task
         taskMgr.add(self.update, 'updateWorld') 
+        taskMgr.doMethodLater(5.0, self.countGrass, 'grass_counter')
         
         # Physics
         self.setup()
@@ -92,8 +94,16 @@ class Game(DirectObject):
             #self.filters.update()            
             self.hud.updateGuiNodes() 
             
-  # ____TASK___
 
+    def countGrass(self, task):
+        current=self.grass.getStatus()
+        if self.grass_to_cut ==0:
+            self.grass_to_cut=current
+        v= (float(current)/float(self.grass_to_cut))
+        #print self.grass_to_cut,  current
+        self.hud.counter['text']= str(int(v*100.0))+"%"
+        return task.again
+        
     def update(self, task):
         dt = globalClock.getDt()
         
@@ -101,6 +111,8 @@ class Game(DirectObject):
             self.car.drive(dt)
             self.hud.showSpeed(self.car.getKmph())
             self.hud.showFuel(self.car.fuel)
+            self.grass.setMowerPos(self.car.blade_node)
+            self.hud.grradar_display['frameTexture']=self.grass.gradar['tex']
             node_to_follow=self.car.node
             speed=0.3
         elif self.mode==WALKING:    
@@ -108,29 +120,42 @@ class Game(DirectObject):
             node_to_follow=self.char.actor_node
             speed=0.03
         self.world.doPhysics(dt, 10, 0.001)
-        self.camera.follow(node_to_follow, dt, speed)
+        if self.mode!=EXITING:
+            self.camera.follow(node_to_follow, dt, speed)
         return task.cont
 
     def cleanup(self):
         self.world = None
         self.worldNP.removeNode()
     
+    def _setMode(self, mode):
+        self.mode=mode
+        self.camera.zoomIn()
+        
     def changeMode(self):
         if self.mode==DRIVING:
             if self.car.stopEngine():
-                self.mode=WALKING
-                self.camera.zoomIn()
+                self.car.exitCar()
+                self.char.exitCar(self.car.node)
+                #self.char.getOutOfCar(self.car.node)
+                Sequence(Wait(3.6), Func(self._setMode, WALKING)).start()
+                self.mode=EXITING
+                #self.camera.zoomIn()
                 self.hud.hide()
         elif self.mode==WALKING:
-            self.mode=DRIVING
-            self.camera.zoomOut()
-            self.hud.show()
-            #self.car.node.node().setMass(self.car.mass)
+            if abs(self.char.node.getDistance(self.car.node))<2.0:
+                #if self.char
+                self.mode=DRIVING
+                self.camera.zoomOut()
+                self.hud.show()
+                self.char.enterCar()
+                self.car.enterCar()
+                #self.car.node.node().setMass(self.car.mass)
             
     def doFlip(self):
         if self.mode==DRIVING:
             self.car.flip()
-        
+            self.grass.getStatus()
         if self.mode==WALKING:
             self.char.jump()
     
@@ -138,8 +163,10 @@ class Game(DirectObject):
         if self.mode==DRIVING:
             if self.car.blade_spining:
                 self.car.blade_spining=False
+                self.grass.mower_blade.hide()
             else:    
                 self.car.blade_spining=True
+                self.grass.mower_blade.show()
                 
     def setup(self):
         self.worldNP = render.attachNewNode('World')
@@ -184,7 +211,8 @@ class Game(DirectObject):
         self.ground.setTexturesByID(6, 6)   
         #grass
         self.grass=Grass()
-             
+        self.grass.setMap(path+'levels/gandg/grass.png')     
+        self.grass_to_cut=self.grass.getStatus()
         # Car
         self.car=Car(self.world, self.worldNP)
         self.car.setPos(256, 256, 40)
@@ -193,7 +221,8 @@ class Game(DirectObject):
         
         #car to character scale 0.0128        
         self.char=Character(self.world, self.worldNP)        
-        self.char.setPos(256, 250, 80)
+        self.char.enterCar()
+        #self.char.setPos(256, 250, 80)
         
         self.hud=HUD()
         

@@ -12,3 +12,7 @@ Some sounds based on:
 http://www.freesound.org/people/Erdie/sounds/34372/ 
 http://www.freesound.org/people/MarlonHJ/sounds/242740/
 http://www.freesound.org/people/SmiertSpionem/sounds/38556/
+
+Fonts used:
+Let's go Digital Regular by Wolf Lambert 
+http://www.fonts2u.com/lets-go-digital-regular.font

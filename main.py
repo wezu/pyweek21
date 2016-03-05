@@ -3,6 +3,7 @@ from panda3d.core import loadPrcFileData
 loadPrcFileData("", "window-type none")
 loadPrcFileData("", "sync-video 0")
 loadPrcFileData("", "framebuffer-srgb true")
+loadPrcFileData("", "show-buffers 0")
 from direct.showbase.AppRunnerGlobal import appRunner
 if appRunner: #run from binary/p3d
     path=appRunner.p3dFilename.getDirname()+'/'

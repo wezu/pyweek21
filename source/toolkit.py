@@ -1,4 +1,16 @@
 from panda3d.core import *
+
+def tex(file_name, srgb=False):
+    texture=loader.loadTexture(file_name)
+    tex_format=texture.getFormat()
+    if srgb:
+        if tex_format==Texture.F_rgb:
+            tex_format=Texture.F_srgb
+        elif tex_format==Texture.F_rgba:
+            tex_format=Texture.F_srgb_alpha  
+        texture.setFormat(tex_format) 
+    return texture
+         
 def pos2d(x,y):
     return Point3(x,0,-y)
     

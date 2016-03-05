@@ -1,6 +1,7 @@
 from direct.showbase.DirectObject import DirectObject
 from direct.showbase.InputStateGlobal import inputState
 from direct.interval.IntervalGlobal import *
+from direct.actor.Actor import Actor
 from panda3d.core import *
 from panda3d.bullet import *
 from toolkit import *
@@ -43,11 +44,15 @@ class Car():
         if cfg['srgb']: fixSrgbTextures(self.model)
         
         self.blade=loader.loadModel(path+'models/blade')
-        self.blade. reparentTo(self.model)
+        self.blade.reparentTo(self.model)
         self.blade.setPos(0, -0.924, 0.089)
         if cfg['srgb']: fixSrgbTextures(self.blade)
         
         self.blade_spining=False
+        
+        self.blade_node=self.model.attachNewNode('static_blade_node')
+        self.blade_node.setPos(0, -0.924, 0.089)
+        
         self.fuel=100.0
         
         # Right front wheel
@@ -64,7 +69,24 @@ class Car():
         self.engine_force=0.0
         self.steering_clamp = 30.0      
         self.steering_increment = 0.6                 
-    
+        
+        self.actor=Actor(path+'models/m_rocket',
+                        {'drive':path+'models/a_rocket_drive',
+                        'exit':path+'models/a_rocket_exit'}) 
+        self.actor.loop('drive')                 
+        self.actor.setScale(0.0128)
+        self.actor.setH(180)
+        self.actor.setBlend(frameBlend = True)
+        self.actor.reparentTo(self.node)
+        if cfg['hardware-skinning']:  
+            attr = ShaderAttrib.make(Shader.load(Shader.SLGLSL, 'shaders/actor_v.glsl', 'shaders/default_f.glsl'))
+            attr = attr.setFlag(ShaderAttrib.F_hardware_skinning, True)
+            self.actor.setAttrib(attr)
+        else:              
+            self.actor.setShader(Shader.load(Shader.SLGLSL, 'shaders/default_v.glsl', 'shaders/default_f.glsl'))
+        if cfg['srgb']: fixSrgbTextures(self.actor)
+        
+        
         #sfx
         self.sfx={}
         self.sfx['engine']=loader.loadSfx("sfx/engine2.ogg")
@@ -88,6 +110,14 @@ class Car():
             self.sfx[sound].setVolume(0.5)
             
         self.isEngineRunning=False
+    
+    def exitCar(self):
+        self.actor.play('exit')
+        Sequence(Wait(3.5), Func(self.actor.hide)).start()
+    
+    def enterCar(self):
+        self.actor.play('drive')
+        self.actor.show()
         
     def isSfxPlaying(self, name):
         if self.sfx[name].status() == AudioSound.PLAYING:
@@ -177,8 +207,8 @@ class Car():
         self.sfx['mower'].stop()       
         self.isEngineRunning=False
         self.blade_spining=False
-        self.vehicle.setBrake(5.0, 2)
-        self.vehicle.setBrake(5.0, 3)
+        self.vehicle.setBrake(10.0, 2)
+        self.vehicle.setBrake(10.0, 3)
         if self.fuel>-1.0:
             self.playSfx('choke')
             self.fuel=-2.0
@@ -275,8 +305,8 @@ class Car():
         self.vehicle.applyEngineForce(self.engine_force, 3)        
         self.vehicle.setBrake(self.brake_force, 2)
         self.vehicle.setBrake(self.brake_force, 3)
-        self.fuel-=dt*self.engine_force*0.0001
-        
+        self.fuel-=dt*self.engine_force*0.0001   
+      
     def setPos(self, *args):
         pos=[]
         for arg in args:

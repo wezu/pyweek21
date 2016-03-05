@@ -1,7 +1,7 @@
 from panda3d.core import *
 from direct.gui.DirectGui import *
 from direct.interval.IntervalGlobal import *
-from toolkit import rec2d, pos2d, resetPivot2d
+from toolkit import *
 
 class HUD():
     def __init__(self):  
@@ -18,7 +18,7 @@ class HUD():
               
         self.fuel_gage=DirectFrame(frameSize=rec2d(128,128),
                                     frameColor=(1,1,1,1),
-                                    frameTexture=path+'gui/fuel.png', 
+                                    frameTexture=tex('gui/fuel.png', cfg['srgb']), 
                                     parent=self.top_left)  
         resetPivot2d(self.fuel_gage) 
         self.fuel_gage.setPos(pos2d(0,0))
@@ -28,7 +28,7 @@ class HUD():
         
         self.fuel_arrow_vis=DirectFrame(frameSize=rec2d(64,64),
                                     frameColor=(1,1,1,1),
-                                    frameTexture=path+'gui/arrow.png', 
+                                    frameTexture=tex('gui/arrow.png', cfg['srgb']), 
                                     parent=self.top_left)  
         resetPivot2d(self.fuel_arrow_vis) 
         self.fuel_arrow_vis.setPos(pos2d(35,35))
@@ -37,7 +37,7 @@ class HUD():
         
         self.speed_gage=DirectFrame(frameSize=rec2d(128,128),
                                     frameColor=(1,1,1,1),
-                                    frameTexture=path+'gui/mph.png', 
+                                    frameTexture=tex('gui/mph.png', cfg['srgb']), 
                                     parent=self.top_right)  
         resetPivot2d(self.speed_gage) 
         self.speed_gage.setPos(pos2d(-128,0))
@@ -47,12 +47,55 @@ class HUD():
         
         self.speed_arrow_vis=DirectFrame(frameSize=rec2d(64,64),
                                     frameColor=(1,1,1,1),
-                                    frameTexture=path+'gui/arrow.png', 
+                                    frameTexture=tex('gui/arrow.png', cfg['srgb']), 
                                     parent=self.top_right)  
         resetPivot2d(self.speed_arrow_vis) 
         self.speed_arrow_vis.setPos(pos2d(35-128,13))
         self.speed_arrow_vis.wrtReparentTo(self.speed_arrow)  
         #self.speed_arrow.setR(54)
+        
+        self.grradar_frame=DirectFrame(frameSize=rec2d(128,128),
+                                    frameColor=(1,1,1,1),
+                                    frameTexture=tex('gui/radar_frame.png', cfg['srgb']), 
+                                    parent=self.bottom_left)  
+        resetPivot2d(self.grradar_frame) 
+        self.grradar_frame.setPos(pos2d(0,-128))
+        
+        self.grradar_display=DirectFrame(frameSize=rec2d(128,128),
+                                    frameColor=(1,1,1,1),
+                                    frameTexture=tex('gui/radar_frame.png', cfg['srgb']), 
+                                    parent=self.bottom_left)  
+        resetPivot2d(self.grradar_display) 
+        self.grradar_display.setPos(pos2d(0,-128))
+        
+        
+        self.gradar_axis=self.bottom_left.attachNewNode('gradar_axis')
+        self.gradar_axis.setPos(pos2d(64,64-128))
+        
+        self.gradar_ping=DirectFrame(frameSize=rec2d(128,128),
+                                    frameColor=(1,1,1,1),
+                                    frameTexture=tex('gui/radar.png', cfg['srgb']), 
+                                    parent=self.bottom_left)  
+        resetPivot2d(self.gradar_ping) 
+        self.gradar_ping.setPos(pos2d(0,-128))
+        self.gradar_ping.wrtReparentTo(self.gradar_axis) 
+        
+        LerpHprInterval(self.gradar_axis, 5.0, (0,0, 360), (0,0,0)).loop()
+        
+        self.font = loader.loadFont(path+'gui/font.ttf')
+        self.font.setPixelsPerUnit(45)        
+        
+        self.counter=DirectFrame(frameSize=rec2d(128,128),
+                                    frameColor=(1,1,1,0),
+                                    text="100%",
+                                    text_font=self.font,                                
+                                    text_scale = 45,
+                                    text_fg=(0.0282, 0.54,0.0165, 1.0),   
+                                    textMayChange=1,
+                                    text_pos=(-60,10),
+                                    parent=self.bottom_left)  
+        resetPivot2d(self.counter) 
+        self.counter.setPos(pos2d(0,-256))
         
         
         

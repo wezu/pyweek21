@@ -13,6 +13,7 @@ uniform mat4 tpose_model_to_world; //pre 1.10 cg-style input
 uniform mat4 p3d_ModelMatrix;
 uniform sampler2D height;
 uniform sampler2D grass;
+uniform sampler2D cut;
 uniform vec2 uv_offset;
 uniform float z_scale;
 
@@ -29,7 +30,8 @@ void main()
     color_uv = p3d_MultiTexCoord0; 
     vec4 v = vec4(p3d_Vertex)+vec4(mod(float(gl_InstanceID), 16.0), floor((float(gl_InstanceID)*0.0625)+0.5),0.0, 0.0)*16.0;    
     uv=vec2(v.x*0.001953125, v.y*0.001953125)+uv_offset;    
-    vec4 blend_mask=textureLod(grass,uv, 0.0);    
+    vec4 blend_mask=textureLod(grass,uv, 0.0); 
+    blend_mask -=textureLod(cut,uv, 0.0).r; 
     normal = (tpose_model_to_world * vec4(p3d_Normal, 0.0)).xyz;
     
     if(dot(blend_mask.rgb, vec3(1.0, 1.0, 1.0)) < 0.1)        
