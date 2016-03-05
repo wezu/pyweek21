@@ -13,6 +13,7 @@ in vec2 p3d_MultiTexCoord0;
 out vec3 normal;
 out vec4 world_pos;
 out vec2 uv;
+
 //uniform float bias;
 //uniform mat4 trans_model_to_clip_of_shadowCamera;
 //out vec4 shadowCoord;
@@ -23,4 +24,10 @@ void main()
     uv = p3d_MultiTexCoord0;
     normal = (tpose_model_to_world * vec4(p3d_Normal, 0.0)).xyz; 
     world_pos=p3d_ModelMatrix* p3d_Vertex;      
+    
+     // Calculate light-space clip position.
+    //vec4 pushed = p3d_Vertex + vec4(p3d_Normal * bias, 0);
+    //vec4 lightclip = trans_model_to_clip_of_shadowCamera * pushed;
+    // Calculate shadow-map texture coordinates.
+    //shadowCoord = lightclip * vec4(0.5,0.5,0.5,1.0) + lightclip.w * vec4(0.5,0.5,0.5,0.0);
     }

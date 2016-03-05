@@ -86,6 +86,7 @@ class Grass():
         props.setSrgbColor(False)  
         props.setFloatColor(False)      
         buff=base.win.makeTextureBuffer("buff", 128, 128, tex, fbp=props)
+        buff.setClearColor(VBase4(0,0,0,0))
         #the camera for the buffer
         cam=base.makeCamera(win=buff)
         cam.reparentTo(root)          

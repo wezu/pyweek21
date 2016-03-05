@@ -15,8 +15,8 @@ uniform vec4 cloudColor;
 in vec2 uv;
 in vec4 world_pos;
 in vec3 normal;
-//in vec4 shadowCoord;
-//uniform sampler2D shadow;
+in vec4 shadowCoord;
+uniform sampler2D shadow;
 
 
 //TBN by Chris­t­ian Schuler from http://www.thetenthplanet.de/archives/1180
@@ -101,6 +101,6 @@ void main()
     //float shadowColor = texture(shadow, shadowUV.xy).r;    
     //float shade = 1.0;
     //if (shadowColor < shadowUV.z-0.005)
-     //   shade=fog_factor;        
+    //   shade=fog_factor;        
     //gl_FragData[1]=vec4(fog_factor, shade, shade*specular*(1.0-fog_factor),0.0);
     }

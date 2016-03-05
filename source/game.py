@@ -14,6 +14,8 @@ from sky import Sky
 from terrain import Terrain
 from grass import Grass
 from hud import HUD
+from postprocess import Postprocess
+
 DRIVING=1
 WALKING=2
 EXITING=3
@@ -91,7 +93,7 @@ class Game(DirectObject):
         
     def onWindowEvent(self,window=None):
         if window is not None: # window is none if panda3d is not started             
-            #self.filters.update()            
+            self.filters.update()            
             self.hud.updateGuiNodes() 
             
 
@@ -199,16 +201,16 @@ class Game(DirectObject):
         
         #terrain
         self.ground=Terrain(self.world, self.worldNP)        
-        self.ground.loadMesh(path+'levels/gandg/collision')
-        self.ground.setMaps(path+'levels/gandg/')        
+        self.ground.loadMesh(path+'levels/gandg2/collision')
+        self.ground.setMaps(path+'levels/gandg2/')        
         #TODO : this is stupid! |   |
         #                      \|/ \|/
-        self.ground.setTexturesByID(1, 1)
-        self.ground.setTexturesByID(2, 2)
-        self.ground.setTexturesByID(3, 3)
-        self.ground.setTexturesByID(4, 4)
-        self.ground.setTexturesByID(5, 5)
-        self.ground.setTexturesByID(6, 6)   
+        self.ground.setTexturesByID(39, 1)
+        self.ground.setTexturesByID(1, 2)
+        self.ground.setTexturesByID(2, 3)
+        self.ground.setTexturesByID(15, 4)
+        self.ground.setTexturesByID(4, 5)
+        self.ground.setTexturesByID(5, 6)   
         #grass
         self.grass=Grass()
         self.grass.setMap(path+'levels/gandg/grass.png')     
@@ -223,6 +225,13 @@ class Game(DirectObject):
         self.char=Character(self.world, self.worldNP)        
         self.char.enterCar()
         #self.char.setPos(256, 250, 80)
+        
+        #filter manager, post process
+        self.filters=Postprocess()        
+        self.filters.setupFxaa() 
+        #no time to make it work, sorry...
+        #self.filters.setupFilters()
+        
         
         self.hud=HUD()
         

@@ -129,12 +129,12 @@ void main()
         color +=specular;
         vec4 final= vec4(color.rgb * detail.xyz, 1.0);             
         //vec4 final= vec4(color.rgb, 1.0);             
-        float shade = 1.0;      
-        vec4 shadowUV = shadowCoord / shadowCoord.q;
-        float shadowColor = texture(shadow, shadowUV.xy).r;            
-        if (shadowColor < shadowUV.z-0.001)
-            shade=fog_factor;                    
-        specular=specular*(1.0-fog_factor)*0.2;                
+        //float shade = 1.0;      
+        //vec4 shadowUV = shadowCoord / shadowCoord.q;
+        //float shadowColor = texture(shadow, shadowUV.xy).r;            
+        //if (shadowColor < shadowUV.z-0.001)
+        //    shade=fog_factor;                    
+        //specular=specular*(1.0-fog_factor)*0.2;                
         gl_FragData[0] = mix(final, fog_color ,fog_factor);                
         //gl_FragData[0]=vec4(color.rgb, 1.0);
         //gl_FragData[0] = vec4(fog_color.rgb, 1.0);                

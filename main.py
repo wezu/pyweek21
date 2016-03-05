@@ -1,6 +1,7 @@
 import __builtin__ as builtins
 from panda3d.core import loadPrcFileData
 loadPrcFileData("", "window-type none")
+loadPrcFileData("", "textures-power-2 None")
 loadPrcFileData("", "sync-video 0")
 loadPrcFileData("", "framebuffer-srgb true")
 loadPrcFileData("", "show-buffers 0")
@@ -27,7 +28,7 @@ class App():
         builtins.path=path
         
         cfg={'simple-shaders':False,
-             'shadow-size':1024,
+             'shadow-size':128,
              'shadow-area':400,
              'srgb':True,
              'hardware-skinning':True }
