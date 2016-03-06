@@ -1,0 +1,22 @@
+sync-video 0
+
+framebuffer-srgb true
+
+win-size 800 600
+sound-volume 100
+
+music-volume 50
+
+key-forward w
+
+key-back s
+
+key-left a
+
+key-right d
+
+key-jump space
+
+key-cut-grass shift
+
+key-enter-exit-car tab

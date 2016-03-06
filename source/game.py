@@ -22,42 +22,43 @@ EXITING=3
 
 class Game(DirectObject):
     def __init__(self):      
-        #the window props should be set by this time, but make sure 
+        #the window props
         wp = WindowProperties.getDefault()                  
         wp.setUndecorated(False)          
         wp.setFullscreen(False)     
-        wp.setSize(800, 600)   
-        #these probably won't be in the config (?)
+        wp.setSize(cfg['win-size'][0], cfg['win-size'][1])  
         wp.setOrigin(-2,-2)  
         wp.setFixedSize(False)  
-        wp.setTitle("PyWeek 21")
+        wp.setTitle("Grass and Gas - wezu -PyWeek 21")
         #open the window
         base.openMainWindow(props = wp)  
           
-        base.setBackgroundColor(0.1, 0.1, 0.8, 1)
-        base.setFrameRateMeter(True)
+        base.setBackgroundColor(0, 0, 0, 1)
         base.disableMouse()   
         
         self.mode=DRIVING
         
         # Input
+        cfg['key-forward']=ConfigVariableString('key-forward','w').getValue()
+        cfg['key-back']=ConfigVariableString('key-back','s').getValue()
+        cfg['key-left']=ConfigVariableString('key-left','a').getValue()
+        cfg['key-right']=ConfigVariableString('key-right','d').getValue()
+        cfg['key-jump']=ConfigVariableString('key-jump','space').getValue()
+        cfg['key-cut-grass']=ConfigVariableString('key-cut-grass','shift').getValue()
+        cfg['key-enter-exit-car']
+        
+        
         self.accept('escape', self.doExit)
-        self.accept('r', self.doReset)
-        self.accept('f1', self.toggleWireframe)
-        self.accept('f2', self.toggleTexture)
-        self.accept('f3', self.toggleDebug)
-        self.accept('f5', self.doScreenshot)
-        self.accept('space', self.doFlip)
-        self.accept('tab', self.changeMode)
-        self.accept('shift', self.shear)
+        self.accept('f1', self.hideHelp)
+        self.accept(cfg['key-jump'], self.doFlip)
+        self.accept( cfg['key-enter-exit-car'], self.changeMode)
+        self.accept(cfg['key-cut-grass'], self.shear)
         self.accept( 'window-event', self.onWindowEvent)
         
-        inputState.watchWithModifiers('forward', 'w')
-        inputState.watchWithModifiers('left', 'q')
-        inputState.watchWithModifiers('reverse', 's')
-        inputState.watchWithModifiers('right', 'e')
-        inputState.watchWithModifiers('turnLeft', 'a')
-        inputState.watchWithModifiers('turnRight', 'd')
+        inputState.watchWithModifiers('forward', cfg['key-forward'])
+        inputState.watchWithModifiers('reverse', cfg['key-back'])
+        inputState.watchWithModifiers('turnLeft', cfg['key-left'])
+        inputState.watchWithModifiers('turnRight', cfg['key-right'])
 
         # Task
         taskMgr.add(self.update, 'updateWorld') 
@@ -67,7 +68,12 @@ class Game(DirectObject):
         self.setup()
         
         # _____HANDLER_____
-
+    def hideHelp(self):        
+        if self.hud.help_frame.isHidden():
+            self.hud.help_frame.show()
+        else:
+            self.hud.help_frame.hide()
+            
     def doExit(self):
         self.cleanup()
         sys.exit(1)
@@ -144,6 +150,8 @@ class Game(DirectObject):
                 self.mode=EXITING
                 #self.camera.zoomIn()
                 self.hud.hide()
+                self.driving_music.stop()
+                self.walking_music.play()
         elif self.mode==WALKING:
             if abs(self.char.node.getDistance(self.car.node))<2.0:
                 #if self.char
@@ -152,6 +160,8 @@ class Game(DirectObject):
                 self.hud.show()
                 self.char.enterCar()
                 self.car.enterCar()
+                self.driving_music.play()
+                self.walking_music.stop()
                 #self.car.node.node().setMass(self.car.mass)
             
     def doFlip(self):
@@ -236,70 +246,70 @@ class Game(DirectObject):
         #map objects .. hardcoded because of time
         self.object_root=render.attachNewNode('object_root')
         obj=[
-            (path+'models/pyweek_wall1',0.0,(303.0,405.0,25.0980415344238)),
-            (path+'models/pyweek_wall1',0.0,(301.0,405.0,25.0980434417725)),
-            (path+'models/pyweek_wall1',0.0,(299.0,405.0,25.0980415344238)),
-            (path+'models/pyweek_wall1',0.0,(297.0,405.0,25.0980415344238)),
-            (path+'models/pyweek_wall1',0.0,(295.0,405.0,25.0980415344238)),
-            (path+'models/pyweek_wall1',0.0,(293.0,405.0,25.0980434417725)),
-            (path+'models/pyweek_wall1',0.0,(291.0,405.0,25.0980415344238)),
-            (path+'models/pyweek_wall1',0.0,(289.0,405.0,25.0980415344238)),
-            (path+'models/pyweek_wall1',0.0,(287.0,405.0,25.0980415344238)),
-            (path+'models/pyweek_wall1',0.0,(285.0,405.0,25.0980415344238)),
-            (path+'models/pyweek_wall1',0.0,(283.0,405.0,25.0980415344238)),
-            (path+'models/pyweek_wall1',0.0,(281.0,405.0,25.0980415344238)),
-            (path+'models/pyweek_wall1',0.0,(281.0,385.0,25.0980415344238)),
-            (path+'models/pyweek_wall1',0.0,(283.0,385.0,25.0980453491211)),
-            (path+'models/pyweek_wall1',0.0,(285.0,385.0,25.0980415344238)),
-            (path+'models/pyweek_wall1',90.0,(304.0,404.0,25.0980415344238)),
-            (path+'models/pyweek_wall1',90.0,(304.0,402.0,25.0980415344238)),
-            (path+'models/pyweek_wall1',90.0,(304.0,400.0,25.0980415344238)),
-            (path+'models/pyweek_wall1',90.0,(304.0,398.0,25.0980415344238)),
-            (path+'models/pyweek_wall1',90.0,(304.0,396.0,25.0980415344238)),
-            (path+'models/pyweek_wall1',90.0,(304.0,394.0,25.0980415344238)),
-            (path+'models/pyweek_wall1',90.0,(304.0,392.0,25.237850189209)),
-            (path+'models/pyweek_wall1',90.0,(280.0,404.0,25.0980415344238)),
-            (path+'models/pyweek_wall1',90.0,(280.0,398.0,25.0980415344238)),
-            (path+'models/pyweek_wall1',90.0,(280.0,396.0,25.0980415344238)),
-            (path+'models/pyweek_wall1',90.0,(280.0,394.0,25.0980415344238)),
-            (path+'models/pyweek_wall1',90.0,(280.0,392.0,25.0980415344238)),
-            (path+'models/pyweek_wall1',90.0,(280.0,390.0,25.0980415344238)),
-            (path+'models/pyweek_wall1',90.0,(280.0,388.0,25.0980415344238)),
-            (path+'models/pyweek_wall1',90.0,(280.0,386.0,25.0980415344238)),
-            (path+'models/pyweek_wall1',90.0,(286.0,386.0,25.0980415344238)),
-            (path+'models/pyweek_wall1',90.0,(286.0,388.0,25.0980415344238)),
-            (path+'models/pyweek_wall1',90.0,(286.0,390.0,25.0980434417725)),
-            (path+'models/pyweek_wall1',0.0,(287.0,391.0,25.0980415344238)),
-            (path+'models/pyweek_wall1',0.0,(289.0,391.0,25.1190624237061)),
-            (path+'models/pyweek_wall1',0.0,(291.0,391.0,25.1960334777832)),
-            (path+'models/pyweek_wall1',0.0,(293.0,391.0,25.1596641540527)),
-            (path+'models/pyweek_wall1',0.0,(295.0,391.0,25.2697868347168)),
-            (path+'models/pyweek_wall1',0.0,(297.0,391.0,25.3282146453857)),
-            (path+'models/pyweek_wall1',0.0,(299.0,391.0,25.3496627807617)),
-            (path+'models/pyweek_wall1',0.0,(301.0,391.0,25.2688617706299)),
-            (path+'models/pyweek_wall1',0.0,(303.0,391.0,25.2534332275391)),
-            (path+'models/pyweek_box',0.0,(279.600006103516,401.700012207031,25.0980415344238)),
-            (path+'models/pyweek_box',0.0,(279.399993896484,402.200012207031,25.0980415344238)),
-            (path+'models/pyweek_box',0.0,(279.600006103516,402.700012207031,25.0980415344238)),
-            (path+'models/pyweek_box',0.0,(279.399993896484,403.399993896484,25.0980415344238)),
-            (path+'models/pyweek_box',0.0,(278.799987792969,402.799987792969,25.0980415344238)),
-            (path+'models/pyweek_box',0.0,(278.799987792969,402.100006103516,25.0980415344238)),
-            (path+'models/pyweek_box',0.0,(279.0,401.5,25.0980415344238)),
-            (path+'models/pyweek_box',0.0,(278.5,401.600006103516,25.0980415344238)),
-            (path+'models/pyweek_box',0.0,(278.799987792969,401.899993896484,25.5980415344238)),
-            (path+'models/pyweek_wall1',90.0,(280.0,402.0,25.0980415344238)),
-            (path+'models/pyweek_box',90.0,(279.5,402.600006103516,25.5980415344238)),
-            (path+'models/pyweek_box',90.0,(279.0,402.5,25.5980415344238)),
-            (path+'models/pyweek_box',90.0,(279.399993896484,402.0,25.5980415344238)),
-            (path+'models/pyweek_box',90.0,(278.100006103516,402.299987792969,25.0980415344238)),
-            (path+'models/pyweek_box',90.0,(277.799987792969,401.700012207031,25.0980415344238)),
-            (path+'models/pyweek_box',90.0,(278.200012207031,401.899993896484,25.5980415344238)),
-            (path+'models/pyweek_box',90.0,(279.399993896484,402.399993896484,26.0980415344238)),
-            (path+'models/pyweek_box',90.0,(279.0,401.899993896484,26.0980415344238)),
-            (path+'models/pyweek_box',90.0,(278.799987792969,402.399993896484,26.0980415344238))
+            (path+'models/pyweek_wall1',0.0,(303.0,405.0,25.0980415344238),path+'models/pyweek_wall1_collision'),
+            (path+'models/pyweek_wall1',0.0,(301.0,405.0,25.0980434417725),path+'models/pyweek_wall1_collision'),
+            (path+'models/pyweek_wall1',0.0,(299.0,405.0,25.0980415344238),path+'models/pyweek_wall1_collision'),
+            (path+'models/pyweek_wall1',0.0,(297.0,405.0,25.0980415344238),path+'models/pyweek_wall1_collision'),
+            (path+'models/pyweek_wall1',0.0,(295.0,405.0,25.0980415344238),path+'models/pyweek_wall1_collision'),
+            (path+'models/pyweek_wall1',0.0,(293.0,405.0,25.0980434417725),path+'models/pyweek_wall1_collision'),
+            (path+'models/pyweek_wall1',0.0,(291.0,405.0,25.0980415344238),path+'models/pyweek_wall1_collision'),
+            (path+'models/pyweek_wall1',0.0,(289.0,405.0,25.0980415344238),path+'models/pyweek_wall1_collision'),
+            (path+'models/pyweek_wall1',0.0,(287.0,405.0,25.0980415344238),path+'models/pyweek_wall1_collision'),
+            (path+'models/pyweek_wall1',0.0,(285.0,405.0,25.0980415344238),path+'models/pyweek_wall1_collision'),
+            (path+'models/pyweek_wall1',0.0,(283.0,405.0,25.0980415344238),path+'models/pyweek_wall1_collision'),
+            (path+'models/pyweek_wall1',0.0,(281.0,405.0,25.0980415344238),path+'models/pyweek_wall1_collision'),
+            (path+'models/pyweek_wall1',0.0,(281.0,385.0,25.0980415344238),path+'models/pyweek_wall1_collision'),
+            (path+'models/pyweek_wall1',0.0,(283.0,385.0,25.0980453491211),path+'models/pyweek_wall1_collision'),
+            (path+'models/pyweek_wall1',0.0,(285.0,385.0,25.0980415344238),path+'models/pyweek_wall1_collision'),
+            (path+'models/pyweek_wall1',90.0,(304.0,404.0,25.0980415344238),path+'models/pyweek_wall1_collision'),
+            (path+'models/pyweek_wall1',90.0,(304.0,402.0,25.0980415344238),path+'models/pyweek_wall1_collision'),
+            (path+'models/pyweek_wall1',90.0,(304.0,400.0,25.0980415344238),path+'models/pyweek_wall1_collision'),
+            (path+'models/pyweek_wall1',90.0,(304.0,398.0,25.0980415344238),path+'models/pyweek_wall1_collision'),
+            (path+'models/pyweek_wall1',90.0,(304.0,396.0,25.0980415344238),path+'models/pyweek_wall1_collision'),
+            (path+'models/pyweek_wall1',90.0,(304.0,394.0,25.0980415344238),path+'models/pyweek_wall1_collision'),
+            (path+'models/pyweek_wall1',90.0,(304.0,392.0,25.237850189209),path+'models/pyweek_wall1_collision'),
+            (path+'models/pyweek_wall1',90.0,(280.0,404.0,25.0980415344238),path+'models/pyweek_wall1_collision'),
+            (path+'models/pyweek_wall1',90.0,(280.0,398.0,25.0980415344238),path+'models/pyweek_wall1_collision'),
+            (path+'models/pyweek_wall1',90.0,(280.0,396.0,25.0980415344238),path+'models/pyweek_wall1_collision'),
+            (path+'models/pyweek_wall1',90.0,(280.0,394.0,25.0980415344238),path+'models/pyweek_wall1_collision'),
+            (path+'models/pyweek_wall1',90.0,(280.0,392.0,25.0980415344238),path+'models/pyweek_wall1_collision'),
+            (path+'models/pyweek_wall1',90.0,(280.0,390.0,25.0980415344238),path+'models/pyweek_wall1_collision'),
+            (path+'models/pyweek_wall1',90.0,(280.0,388.0,25.0980415344238),path+'models/pyweek_wall1_collision'),
+            (path+'models/pyweek_wall1',90.0,(280.0,386.0,25.0980415344238),path+'models/pyweek_wall1_collision'),
+            (path+'models/pyweek_wall1',90.0,(286.0,386.0,25.0980415344238),path+'models/pyweek_wall1_collision'),
+            (path+'models/pyweek_wall1',90.0,(286.0,388.0,25.0980415344238),path+'models/pyweek_wall1_collision'),
+            (path+'models/pyweek_wall1',90.0,(286.0,390.0,25.0980434417725),path+'models/pyweek_wall1_collision'),
+            (path+'models/pyweek_wall1',0.0,(287.0,391.0,25.0980415344238),path+'models/pyweek_wall1_collision'),
+            (path+'models/pyweek_wall1',0.0,(289.0,391.0,25.1190624237061),path+'models/pyweek_wall1_collision'),
+            (path+'models/pyweek_wall1',0.0,(291.0,391.0,25.1960334777832),path+'models/pyweek_wall1_collision'),
+            (path+'models/pyweek_wall1',0.0,(293.0,391.0,25.1596641540527),path+'models/pyweek_wall1_collision'),
+            (path+'models/pyweek_wall1',0.0,(295.0,391.0,25.2697868347168),path+'models/pyweek_wall1_collision'),
+            (path+'models/pyweek_wall1',0.0,(297.0,391.0,25.3282146453857),path+'models/pyweek_wall1_collision'),
+            (path+'models/pyweek_wall1',0.0,(299.0,391.0,25.3496627807617),path+'models/pyweek_wall1_collision'),
+            (path+'models/pyweek_wall1',0.0,(301.0,391.0,25.2688617706299),path+'models/pyweek_wall1_collision'),
+            (path+'models/pyweek_wall1',0.0,(303.0,391.0,25.2534332275391),path+'models/pyweek_wall1_collision'),
+            (path+'models/pyweek_wall1',90.0,(280.0,402.0,25.0980415344238),path+'models/pyweek_wall1_collision'),
+            (path+'models/pyweek_box',0.0,(279.600006103516,401.700012207031,25.0980415344238),None),
+            (path+'models/pyweek_box',0.0,(279.399993896484,402.200012207031,25.0980415344238),None),
+            (path+'models/pyweek_box',0.0,(279.600006103516,402.700012207031,25.0980415344238),None),
+            (path+'models/pyweek_box',0.0,(279.399993896484,403.399993896484,25.0980415344238),None),
+            (path+'models/pyweek_box',0.0,(278.799987792969,402.799987792969,25.0980415344238),None),
+            (path+'models/pyweek_box',0.0,(278.799987792969,402.100006103516,25.0980415344238),None),
+            (path+'models/pyweek_box',0.0,(279.0,401.5,25.0980415344238),None),
+            (path+'models/pyweek_box',0.0,(278.5,401.600006103516,25.0980415344238),None),
+            (path+'models/pyweek_box',0.0,(278.799987792969,401.899993896484,25.5980415344238),None),            
+            (path+'models/pyweek_box',90.0,(279.5,402.600006103516,25.5980415344238),None),
+            (path+'models/pyweek_box',90.0,(279.0,402.5,25.5980415344238),None),
+            (path+'models/pyweek_box',90.0,(279.399993896484,402.0,25.5980415344238),None),
+            (path+'models/pyweek_box',90.0,(278.100006103516,402.299987792969,25.0980415344238),None),
+            (path+'models/pyweek_box',90.0,(277.799987792969,401.700012207031,25.0980415344238),None),
+            (path+'models/pyweek_box',90.0,(278.200012207031,401.899993896484,25.5980415344238),None),
+            (path+'models/pyweek_box',90.0,(279.399993896484,402.399993896484,26.0980415344238),None),
+            (path+'models/pyweek_box',90.0,(279.0,401.899993896484,26.0980415344238),None),
+            (path+'models/pyweek_box',90.0,(278.799987792969,402.399993896484,26.0980415344238),None)
             ]
         for i in obj:
-            loadObject(model=i[0], H=i[1], pos=i[2], world=self.world, worldNP=self.worldNP, root=self.object_root, collision_solid=None)
+            loadObject(model=i[0], H=i[1], pos=i[2], world=self.world, worldNP=self.worldNP, root=self.object_root, collision_solid=i[3])
         self.object_root.flattenStrong()
         
         #models/pyweek_gate,90.0,(280.0,399.0,25.0980415344238))
@@ -307,5 +317,17 @@ class Game(DirectObject):
         #gui    
         self.hud=HUD()
         
-
-
+        #volume
+        sfxMgr = base.sfxManagerList[0]
+        sfxMgr.setVolume(cfg['sound-volume']*0.01)
+        musicMgr = base.musicManager
+        musicMgr.setVolume(cfg['music-volume']*0.01)
+        
+        #music
+        self.driving_music=loader.loadMusic(path+'music/driving.ogg')
+        self.driving_music.setLoop(True) 
+        self.driving_music.play()
+        self.walking_music=loader.loadMusic(path+'music/walking.ogg')
+        self.walking_music.setLoop(True) 
+        
+        

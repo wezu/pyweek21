@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<package name="panda3d" platform="win_i386" version="cmu_1.9" per_platform="1" seq="4" patch_version="1">
+    <config display_name="Panda3D" />
+    <uncompressed_archive filename="panda3d.cmu_1.9.win_i386.mf" size="55282375" timestamp="1454963017" hash="71bb839cbc78c9909ca118ea7ff323ca" />
+    <compressed_archive filename="panda3d.cmu_1.9.win_i386.mf.1.pz" size="18168839" timestamp="1454963021" hash="9f7b72eafaac1d86d67e681093cfb3f0" />
+    <extract filename="_hashlib.pyd" size="910336" timestamp="1448281854" hash="324761ca06eb9e4350307780959d8ebd" />
+    <extract filename="_socket.pyd" size="46080" timestamp="1448281864" hash="637aabdff24be92e33f3e71367e6e6a5" />
+    <extract filename="_ssl.pyd" size="1315328" timestamp="1448281865" hash="6ba1564cd78ddb62900ff3327c18587c" />
+    <extract filename="_vfsimporter.pyd" size="799232" timestamp="1454963013" hash="c7f08d53852f0d4a44247aaa06b636fe" />
+    <extract filename="cg.dll" size="8531264" timestamp="1454958186" hash="ae87223e882670029450b3f86e8e9300" />
+    <extract filename="cgD3D9.dll" size="1045824" timestamp="1454958187" hash="9981b512f27b566d811b53590f6ee526" />
+    <extract filename="cgGL.dll" size="359232" timestamp="1454958187" hash="68dbb8778903f5cf0a80c00ffbf494d2" />
+    <extract filename="Config.prc" size="159" timestamp="1454963016" hash="9f3096d0ca7f92992fff68cd4ddaf8e3" />
+    <extract filename="CRYPT32.dll" size="1174528" timestamp="1430157877" hash="f4afdb5abea0c9079e8193e24d1db21d" />
+    <extract filename="libp3direct.dll" size="476672" timestamp="1454960838" hash="79e6e858bdd74a31276d2aa5d594176f" />
+    <extract filename="libp3dpython.dll" size="86528" timestamp="1454960841" hash="f802ebe4c6c8dee37150aab1cac70964" />
+    <extract filename="libp3dtool.dll" size="285184" timestamp="1454958213" hash="af5312fda280f03662efc62f63ef80db" />
+    <extract filename="libp3dtoolconfig.dll" size="991232" timestamp="1454958230" hash="42a29c56c3fe1f2dabccd637a82814c5" />
+    <extract filename="libp3tinydisplay.dll" size="9459712" timestamp="1454960827" hash="31ebd891297a006f8340998f4450a96a" />
+    <extract filename="libp3windisplay.dll" size="119296" timestamp="1454960487" hash="8b188b83cd608df7e01478b5b15c583c" />
+    <extract filename="libpanda.dll" size="10394624" timestamp="1454960465" hash="7f8fcd1cd3b0488a47cbc7a4a954e261" />
+    <extract filename="libpandadx9.dll" size="524288" timestamp="1454960495" hash="0a5e0d84e0ce827dab9781ad934b71dd" />
+    <extract filename="libpandaexpress.dll" size="1844224" timestamp="1454958246" hash="b2ec079f5286f31bf293720a23ba16cd" />
+    <extract filename="libpandafx.dll" size="107008" timestamp="1454960477" hash="bfc0870e514885421c22600b7b018de9" />
+    <extract filename="libpandagl.dll" size="445952" timestamp="1454960608" hash="8215e84531373f8f76fab925af5d19a7" />
+    <extract filename="libpandaphysics.dll" size="356864" timestamp="1454960673" hash="79c19082c789538ef54e23f094ca399a" />
+    <extract filename="Microsoft.VC90.CRT.manifest" size="1860" timestamp="1448281851" hash="587dbe91cf548669e8c8ec8f6d56ce47" />
+    <extract filename="msasn1.dll" size="34304" timestamp="1290309828" hash="938f39b50bafe13d6f58c7790682c010" />
+    <extract filename="MSVCP100.dll" size="421200" timestamp="1454958191" hash="bc83108b18756547013ed443b8cdb31b" />
+    <extract filename="MSVCR100.dll" size="773968" timestamp="1454958191" hash="0e37fbfa79d349d672456923ec5fbbe3" />
+    <extract filename="MSVCR90.dll" size="653136" timestamp="1448281852" hash="cdbe9690cf2b8409facad94fac9479c9" />
+    <extract filename="p3dpython.exe" size="377856" timestamp="1454960840" hash="455d0e9cfd57b1cde7ffc3b9f6f81f35" />
+    <extract filename="p3dpythonw.exe" size="378880" timestamp="1454960843" hash="1fce11301c1e4acbb3f260447b3a49ca" />
+    <extract filename="panda3d/core.pyd" size="7441920" timestamp="1454961895" hash="782aacc1a1cf8812b95814117b4f888d" />
+    <extract filename="panda3d/direct.pyd" size="273920" timestamp="1454961921" hash="56d3921c5b7c72c01d04f907976b6c87" />
+    <extract filename="panda3d/fx.pyd" size="57344" timestamp="1454961899" hash="dc802384bf031ea9e1a0eb0ae48f547e" />
+    <extract filename="panda3d/physics.pyd" size="383488" timestamp="1454961918" hash="8a1482a072292ff19247bba09764a426" />
+    <extract filename="pyexpat.pyd" size="127488" timestamp="1448281852" hash="a572d0b0aa6cb9d2798165981b722781" />
+    <extract filename="python27.dll" size="2459648" timestamp="1454958192" hash="0689bf814812dd1f04d9e62e69b28123" />
+    <extract filename="select.pyd" size="10240" timestamp="1448281853" hash="5602701b02f8f8cac446ad4e4e05c317" />
+    <base_version filename="panda3d.cmu_1.9.win_i386.mf.base" size="55282375" timestamp="1454963017" hash="71bb839cbc78c9909ca118ea7ff323ca" />
+    <top_version filename="panda3d.cmu_1.9.win_i386.mf" size="55282375" timestamp="1454963017" hash="71bb839cbc78c9909ca118ea7ff323ca" />
+</package>

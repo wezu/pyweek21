@@ -72,7 +72,7 @@ class Terrain():
         render.setShaderInput("height",loader.loadTexture(height))
         self.mesh.setShaderInput("atr1",loader.loadTexture(atr1))
         self.mesh.setShaderInput("atr2",loader.loadTexture(atr2))        
-        self.mesh.setShader(Shader.load(Shader.SLGLSL, "shaders/terrain_v.glsl","shaders/terrain2_f.glsl"))        
+        self.mesh.setShader(Shader.load(Shader.SLGLSL, path+"shaders/terrain_v.glsl",path+"shaders/terrain2_f.glsl"))        
         render.setShaderInput("z_scale", 100.0)
         self.mesh.setShaderInput("tex_scale", 128.0)
         self.mesh.setTransparency(TransparencyAttrib.MNone, 1)

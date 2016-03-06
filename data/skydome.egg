@@ -1,7 +1,7 @@
 <CoordinateSystem> { Z-Up }
 
 <Texture> Tex1 {
-  clouds_debug.png
+  clouds.png
   <Scalar> format { rgba }
   <Scalar> wrapu { repeat }
   <Scalar> wrapv { repeat }

@@ -1,15 +1,20 @@
 import __builtin__ as builtins
 from panda3d.core import loadPrcFileData
-loadPrcFileData("", "window-type none")
-loadPrcFileData("", "textures-power-2 None")
-loadPrcFileData("", "sync-video 0")
-loadPrcFileData("", "framebuffer-srgb true")
-loadPrcFileData("", "show-buffers 0")
 from direct.showbase.AppRunnerGlobal import appRunner
 if appRunner: #run from binary/p3d
     path=appRunner.p3dFilename.getDirname()+'/'
 else:  #run from python 
     path=''
+try:    
+    f = open(path+'config.txt', 'r')
+    for line in f:        
+        if not line.startswith('#'):        
+            loadPrcFileData('',line)          
+except IOError:
+    if not appRunner:    
+        print "No config file, using default"   
+loadPrcFileData("", "window-type none")
+loadPrcFileData("", "textures-power-2 None")        
 from panda3d.core import *
 from direct.showbase import ShowBase
 import sys
@@ -32,6 +37,20 @@ class App():
              'shadow-area':400,
              'srgb':True,
              'hardware-skinning':True }
+             
+        cfg['hardware-skinning']=ConfigVariableBool('hardware-skinning', True).getValue()     
+        cfg['srgb']=ConfigVariableBool('framebuffer-srgb', False).getValue()
+        cfg['win-size']=[ConfigVariableInt('win-size', '640 480').getWord(0), ConfigVariableInt('win-size', '640 480').getWord(1)] 
+        cfg['music-volume']=ConfigVariableInt('music-volume', '50').getValue()
+        cfg['sound-volume']=ConfigVariableInt('sound-volume', '100').getValue()
+        cfg['key-forward']=ConfigVariableString('key-forward','w').getValue()
+        cfg['key-back']=ConfigVariableString('key-back','s').getValue()
+        cfg['key-left']=ConfigVariableString('key-left','a').getValue()
+        cfg['key-right']=ConfigVariableString('key-right','d').getValue()
+        cfg['key-jump']=ConfigVariableString('key-jump','space').getValue()
+        cfg['key-cut-grass']=ConfigVariableString('key-cut-grass','shift').getValue()
+        cfg['key-enter-exit-car']=ConfigVariableString('key-enter-exit-car','tab').getValue()
+             
         builtins.cfg=cfg
         
         self.info_level=DEBUG

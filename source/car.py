@@ -13,8 +13,8 @@ class Car():
                 box=Vec3(0.25, 0.9, 0.3),
                 shape_offset=Point3(0, 0.25, 0.4),
                 mass=300.0,
-                chassis='models/car_chassis',
-                wheel='models/wheel1',
+                chassis=path+'models/car_chassis',
+                wheel=path+'models/wheel1',
                 wheel_pos=[Point3(0.35, 0.83, 0.35),Point3(-0.35, 0.83, 0.35),Point3( 0.35, -0.32, 0.35),Point3(-0.35, -0.32, 0.35)],
                 ):
         self.mass=mass  
@@ -40,7 +40,7 @@ class Car():
         #visible part
         self.model = loader.loadModel(chassis)
         self.model.reparentTo(self.node)
-        self.model.setShader(Shader.load(Shader.SLGLSL, 'shaders/default_v.glsl', 'shaders/default_f.glsl'))
+        self.model.setShader(Shader.load(Shader.SLGLSL, path+'shaders/default_v.glsl', path+'shaders/default_f.glsl'))
         if cfg['srgb']: fixSrgbTextures(self.model)
         
         self.blade=loader.loadModel(path+'models/blade')
@@ -79,31 +79,31 @@ class Car():
         self.actor.setBlend(frameBlend = True)
         self.actor.reparentTo(self.node)
         if cfg['hardware-skinning']:  
-            attr = ShaderAttrib.make(Shader.load(Shader.SLGLSL, 'shaders/actor_v.glsl', 'shaders/default_f.glsl'))
+            attr = ShaderAttrib.make(Shader.load(Shader.SLGLSL, path+'shaders/actor_v.glsl', path+'shaders/default_f.glsl'))
             attr = attr.setFlag(ShaderAttrib.F_hardware_skinning, True)
             self.actor.setAttrib(attr)
         else:              
-            self.actor.setShader(Shader.load(Shader.SLGLSL, 'shaders/default_v.glsl', 'shaders/default_f.glsl'))
+            self.actor.setShader(Shader.load(Shader.SLGLSL, path+'shaders/default_v.glsl', path+'shaders/default_f.glsl'))
         if cfg['srgb']: fixSrgbTextures(self.actor)
         
         
         #sfx
         self.sfx={}
-        self.sfx['engine']=loader.loadSfx("sfx/engine2.ogg")
+        self.sfx['engine']=loader.loadSfx(path+"sfx/engine2.ogg")
         self.sfx['engine'].setLoop(True)
-        self.sfx['brum']=loader.loadSfx("sfx/brum2.ogg")
-        self.sfx['skid']=loader.loadSfx("sfx/break3.ogg")
-        self.sfx['skid_start']=loader.loadSfx("sfx/break_start.ogg")
-        self.sfx['engine_start']=loader.loadSfx("sfx/engine_start.ogg")
-        self.sfx['springs']=loader.loadSfx("sfx/springs.ogg")
+        self.sfx['brum']=loader.loadSfx(path+"sfx/brum2.ogg")
+        self.sfx['skid']=loader.loadSfx(path+"sfx/break3.ogg")
+        self.sfx['skid_start']=loader.loadSfx(path+"sfx/break_start.ogg")
+        self.sfx['engine_start']=loader.loadSfx(path+"sfx/engine_start.ogg")
+        self.sfx['springs']=loader.loadSfx(path+"sfx/springs.ogg")
         #self.sfx['crash1']=loader.loadSfx("sfx/crash1.ogg")
         #self.sfx['crash2']=loader.loadSfx("sfx/crash2.ogg")
         #self.sfx['crash3']=loader.loadSfx("sfx/crash3.ogg")
         #self.sfx['crash4']=loader.loadSfx("sfx/crash4.ogg")
-        self.sfx['crash5']=loader.loadSfx("sfx/crash5.ogg")
-        self.sfx['crash6']=loader.loadSfx("sfx/crash6.ogg")
-        self.sfx['choke']=loader.loadSfx("sfx/choke.ogg")
-        self.sfx['mower']=loader.loadSfx("sfx/mower.ogg")
+        self.sfx['crash5']=loader.loadSfx(path+"sfx/crash5.ogg")
+        self.sfx['crash6']=loader.loadSfx(path+"sfx/crash6.ogg")
+        self.sfx['choke']=loader.loadSfx(path+"sfx/choke.ogg")
+        self.sfx['mower']=loader.loadSfx(path+"sfx/mower.ogg")
         self.sfx['mower'].setLoop(True)
                 
         for sound in self.sfx:            
@@ -186,7 +186,7 @@ class Car():
         np = loader.loadModel(model)
         np.reparentTo(self.worldNP)
         if cfg['srgb']: fixSrgbTextures(np)
-        np.setShader(Shader.load(Shader.SLGLSL, 'shaders/default_v.glsl', 'shaders/default_f.glsl'))
+        np.setShader(Shader.load(Shader.SLGLSL, path+'shaders/default_v.glsl', path+'shaders/default_f.glsl'))
         wheel = self.vehicle.createWheel()
         wheel.setNode(np.node())
         wheel.setChassisConnectionPointCs(pos)
@@ -225,7 +225,7 @@ class Car():
         if self.blade_spining:
             self.blade.setH(self.blade.getH()+dt*1500.0)
             self.playSfx('mower')
-            self.fuel-=dt
+            self.fuel-=dt*0.5
         else:
             self.stopSfx('mower')   
         for wheel in self.vehicle.getWheels():

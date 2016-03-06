@@ -5,12 +5,13 @@ from panda3d.bullet import *
 def loadObject(model, H, pos, world, worldNP, root=render, collision_solid=None):
     
     new_model=loader.loadModel(model)
+    new_model.clearModelNodes()
     new_model.reparentTo(root)
     new_model.setPos(render, pos)
     new_model.setH(render, H) 
     new_model.setShader(Shader.load(Shader.SLGLSL, path+'shaders/default_v.glsl', path+'shaders/default_f.glsl'))   
     if collision_solid:
-        collision_mesh=loader.loadModel(collision)
+        collision_mesh=loader.loadModel(collision_solid)
     else:
         collision_mesh=loader.loadModel(model)    
     collision_mesh.setPos(render, pos)

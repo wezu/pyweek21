@@ -35,11 +35,11 @@ class Character():
         self.actor.reparentTo(self.actor_node)  
         self.actor.setBlend(frameBlend = True)
         if cfg['hardware-skinning']:  
-            attr = ShaderAttrib.make(Shader.load(Shader.SLGLSL, 'shaders/actor_v.glsl', 'shaders/default_f.glsl'))
+            attr = ShaderAttrib.make(Shader.load(Shader.SLGLSL, path+'shaders/actor_v.glsl', path+'shaders/default_f.glsl'))
             attr = attr.setFlag(ShaderAttrib.F_hardware_skinning, True)
             self.actor.setAttrib(attr)
         else:              
-            self.actor.setShader(Shader.load(Shader.SLGLSL, 'shaders/default_v.glsl', 'shaders/default_f.glsl'))
+            self.actor.setShader(Shader.load(Shader.SLGLSL, path+'shaders/default_v.glsl', path+'shaders/default_f.glsl'))
         if cfg['srgb']: fixSrgbTextures(self.actor)
             
         self.world=world

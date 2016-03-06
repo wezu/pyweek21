@@ -8,7 +8,7 @@ class Sky():
         self.skyimg=PNMImage(path+'data/sky_color.png')
         #if cfg['srgb']: self.skyimg.setColorSpace(CS_scRGB) 
         self.skydome = loader.loadModel(path+'data/skydome')
-        tex = loader.loadTexture('data/clouds.png')
+        tex = loader.loadTexture(path+'data/clouds.png')
         if cfg['srgb']:tex.setFormat(Texture.F_srgb_alpha)
         self.skydome.setTexture(tex, 1) 
         self.skydome.reparentTo(render)
@@ -24,7 +24,7 @@ class Sky():
         self.skydome.setTwoSided(True)
         self.skydome.node().setBounds(OmniBoundingVolume())
         self.skydome.node().setFinal(1)
-        self.skydome.setShader(Shader.load(Shader.SLGLSL, 'shaders/cloud_v.glsl', 'shaders/cloud_f.glsl'))
+        self.skydome.setShader(Shader.load(Shader.SLGLSL, path+'shaders/cloud_v.glsl', path+'shaders/cloud_f.glsl'))
         self.skydome.hide(MASK_SHADOW)
         self.skydome.setTransparency(TransparencyAttrib.MNone, 1)
         
