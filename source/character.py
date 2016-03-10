@@ -68,6 +68,9 @@ class Character():
     def enterCar(self):
         self.hide()
     
+    def _resetMass(self):
+        self.node.node().setMass(50.0)
+        
     def exitCar(self, node):        
         pos=node.getPos(render)
         pos[2]+=1.2
@@ -114,7 +117,8 @@ class Character():
             self.actor.pose('jump', 20)
         if self.flying_time>2.0:
             print "reset!"
-            #self.node.node().setMass(0.0)
+            Sequence(Wait(0.5), Func(self._resetMass)).start()
+            self.node.node().setMass(0.0)
             self.node.setPos(self.last_know_ground_pos)
             self.node.setZ(self.node.getZ(render)+1.0)
             self.node.setY(self.node.getY(render)+1.0)
