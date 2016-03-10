@@ -42,6 +42,7 @@ class Car():
         self.model.reparentTo(self.node)
         self.model.setShader(Shader.load(Shader.SLGLSL, path+'shaders/default_v.glsl', path+'shaders/default_f.glsl'))
         if cfg['srgb']: fixSrgbTextures(self.model)
+        self.model.setTransparency(TransparencyAttrib.MNone, 1)
         
         self.blade=loader.loadModel(path+'models/blade')
         self.blade.reparentTo(self.model)
@@ -199,7 +200,7 @@ class Car():
         wheel.setWheelsDampingRelaxation(2.0) #def 2.3
         wheel.setWheelsDampingCompression(2.0) #def 4.4 min 0.1 max 10.0
         wheel.setFrictionSlip(150.0); #max 5.0 min 1.2
-        wheel.setRollInfluence(0.01)
+        wheel.setRollInfluence(0.02)
     
     
     def outOfFuel(self):

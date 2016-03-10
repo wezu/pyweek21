@@ -144,7 +144,7 @@ class Grass():
             self.mower=self.makeBuffer(size=512)
             self.mower['quad'].setColor(0,0,0,1)
             cm = CardMaker("plane")
-            cm.setFrame(-1, 1, -1, 1)        
+            cm.setFrame(-0.5, 0.5, -0.5, 0.5)        
             self.mower_blade=self.mower['root'].attachNewNode(cm.generate())
             self.mower_blade.lookAt(0, 0, -1)      
             self.mower_blade.setZ(10.0)

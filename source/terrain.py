@@ -13,7 +13,8 @@ class Terrain():
         self.tex_normal_path=path+'terrain_tex/normal/'
         self.tex_ext=".dds"
         self.mesh=None
-    
+        render.setShaderInput("z_scale", 100.0)
+        
     def loadMesh(self, mesh_file):
         self.mesh=loader.loadModel(mesh_file)
         self.mesh.reparentTo(render)
@@ -34,7 +35,11 @@ class Terrain():
         self.collision.setCollideMask(BitMask32.allOn())
         self.world.attachRigidBody(self.collision.node())
         #self._showIfReady()
-    
+        
+    def setTextures(self, tex_id_list):
+        for i, tex_id in enumerate(tex_id_list,1):
+            self.setTexturesByID(tex_id, i)
+        
     def setTexturesByID(self, texture_id, stage_id):
         self.textures[stage_id]=texture_id
         diffuse_tex=self.tex_diffuse_path+str(texture_id)+self.tex_ext
@@ -73,8 +78,7 @@ class Terrain():
         self.mesh.setShaderInput("atr1",loader.loadTexture(atr1))
         self.mesh.setShaderInput("atr2",loader.loadTexture(atr2))        
         self.mesh.setShader(Shader.load(Shader.SLGLSL, path+"shaders/terrain_v.glsl",path+"shaders/terrain2_f.glsl"))        
-        render.setShaderInput("z_scale", 100.0)
-        self.mesh.setShaderInput("tex_scale", 128.0)
+        self.mesh.setShaderInput("tex_scale", 164.0)
         self.mesh.setTransparency(TransparencyAttrib.MNone, 1)
         self.mesh.node().setBounds(OmniBoundingVolume())
         self.mesh.node().setFinal(1)

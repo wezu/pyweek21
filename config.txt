@@ -20,3 +20,5 @@ key-jump space
 key-cut-grass shift
 
 key-enter-exit-car tab
+
+show-frame-rate-meter  1

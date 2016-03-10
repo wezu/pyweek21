@@ -138,7 +138,7 @@ class Game(DirectObject):
     
     def _setMode(self, mode):
         self.mode=mode
-        self.camera.zoomIn()
+        #self.camera.zoomIn()
         
     def changeMode(self):
         if self.mode==DRIVING:
@@ -156,7 +156,7 @@ class Game(DirectObject):
             if abs(self.char.node.getDistance(self.car.node))<2.0:
                 #if self.char
                 self.mode=DRIVING
-                self.camera.zoomOut()
+                #self.camera.zoomOut()
                 self.hud.show()
                 self.char.enterCar()
                 self.car.enterCar()
@@ -201,7 +201,7 @@ class Game(DirectObject):
         #shape = BulletTriangleMeshShape(mesh, dynamic=False, bvh=True )                
         #np = self.worldNP.attachNewNode(BulletRigidBodyNode('Ground'))
         #np.node().addShape(shape)
-        #np.setPos(0, 0, -1.0)
+        #np.setPos(0, 0, 20.0)
         #np.setCollideMask(BitMask32.allOn())
         #self.world.attachRigidBody(np.node())
 
@@ -210,17 +210,11 @@ class Game(DirectObject):
         self.sun_sky.setTime(16.0)
         
         #terrain
-        self.ground=Terrain(self.world, self.worldNP)        
+        self.ground=Terrain(self.world, self.worldNP)
         self.ground.loadMesh(path+'levels/gandg2/collision')
-        self.ground.setMaps(path+'levels/gandg2/')        
-        #TODO : this is stupid! |   |
-        #                      \|/ \|/
-        self.ground.setTexturesByID(39, 1)
-        self.ground.setTexturesByID(1, 2)
-        self.ground.setTexturesByID(2, 3)
-        self.ground.setTexturesByID(15, 4)
-        self.ground.setTexturesByID(4, 5)
-        self.ground.setTexturesByID(5, 6)   
+        self.ground.setMaps(path+'levels/gandg2/')
+        self.ground.setTextures((39, 1, 2, 15, 4, 5))
+        
         #grass
         self.grass=Grass()
         self.grass.setMap(path+'levels/gandg2/grass.png')     
@@ -313,7 +307,7 @@ class Game(DirectObject):
         self.object_root.flattenStrong()
         
         #models/pyweek_gate,90.0,(280.0,399.0,25.0980415344238))
-        
+                
         #gui    
         self.hud=HUD()
         
@@ -329,5 +323,4 @@ class Game(DirectObject):
         self.driving_music.play()
         self.walking_music=loader.loadMusic(path+'music/walking.ogg')
         self.walking_music.setLoop(True) 
-        
-        
+
