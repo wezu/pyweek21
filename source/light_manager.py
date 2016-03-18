@@ -8,8 +8,9 @@ class LightManager():
         if max_lights>100:
             max_lights=100
         self.max_lights=max_lights
-        self.ambientLight(ambient)
+        self.ambientLight(ambient)        
         self.update()
+        render.setShaderInput("camera_pos", base.cam.getPos(render))
         taskMgr.add(self._perFrameUpdate, '_perFrameUpdate')
          
     def _perFrameUpdate(self, task):

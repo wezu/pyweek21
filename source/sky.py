@@ -14,20 +14,21 @@ class Sky():
         self.skydome.reparentTo(render)
         self.skydome.setPos(256, 256, -200)
         self.skydome.setScale(10)
-        #self.skydome.setShaderInput("fog", Vec4(1.0,1.0,1.0, 1.0))
-        #self.skydome.setShaderInput("cloudColor", Vec4(0.9,0.9,1.0, 0.8))
+        render.setShaderInput("fog", Vec4(1.0,1.0,1.0, 1.0))
+        render.setShaderInput("cloudColor", Vec4(0.9,0.9,1.0, 0.8))
         self.skydome.setShaderInput("cloudTile",8.0)
         self.skydome.setShaderInput("cloudSpeed",0.008)
-        #self.skydome.setShaderInput("sunColor",Vec4(1.0,1.0,1.0, 1.0))
-        #self.skydome.setShaderInput("skyColor",Vec4(1.0,1.0,1.0, 1.0))
+        render.setShaderInput("sunColor",Vec4(1.0,1.0,1.0, 1.0))
+        render.setShaderInput("skyColor",Vec4(1.0,1.0,1.0, 1.0))
+        render.setShaderInput('sunpos', Vec3(0,0,0))
         self.skydome.setBin('background', 1)
         self.skydome.setTwoSided(True)
         self.skydome.node().setBounds(OmniBoundingVolume())
         self.skydome.node().setFinal(1)
         self.skydome.setShader(Shader.load(Shader.SLGLSL, path+'shaders/cloud_v.glsl', path+'shaders/cloud_f.glsl'))
         self.skydome.hide(MASK_SHADOW)
-        self.skydome.setTransparency(TransparencyAttrib.MNone, 1)
-        
+        self.skydome.setTransparency(TransparencyAttrib.MNone, 1)        
+       
         #light
         self.light_manager=LightManager()
         #sun
@@ -79,7 +80,9 @@ class Sky():
         props.setDepthBits(1)
         props.setAlphaBits(0)
         props.set_srgb_color(False)
-        buff_size=cfg['shadow-size']        
+        buff_size=cfg['shadow-size']
+        if buff_size is None:
+            buff_size=1024
         self.depth_buffer = base.win.makeTextureBuffer("Shadow Buffer",
                                               buff_size,
                                               buff_size,
@@ -91,9 +94,11 @@ class Sky():
         self.shadow_camera = base.makeCamera(self.depth_buffer)
         lens = OrthographicLens()
         shadow_area=cfg['shadow-area']
+        if shadow_area is None:
+            shadow_area=30
         lens.setFilmSize(shadow_area, shadow_area)
         self.shadow_camera.node().setLens(lens)
-        self.shadow_camera.node().getLens().setNearFar(10,400)
+        self.shadow_camera.node().getLens().setNearFar(150,300)
         self.shadow_camera.node().setCameraMask(MASK_SHADOW)
         self.shadow_camera.reparentTo(render)
         #self.shadow_camera.node().showFrustum()
@@ -102,7 +107,7 @@ class Sky():
         
         self.shadow_camera.wrtReparentTo(self.sun_node)
         render.setShaderInput('shadow', depth_map)
-        render.setShaderInput("bias", 1.0)
+        render.setShaderInput("bias", 0.001)
         render.setShaderInput('shadowCamera',self.shadow_camera)   
                
     def _blendPixels(self, p1, p2, blend):

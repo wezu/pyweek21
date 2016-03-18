@@ -9,8 +9,10 @@ class FlyingCamera():
         self.cam_node=render.attachNewNode("cam_node")
         base.cam.reparentTo(self.cam_node)
         base.cam.setPos(offset)
-        base.cam.setP(angle)
-    
+        base.cam.setP(angle) 
+        
+        #base.cam.node().getLens().setNearFar(0.1,1000.0)
+        
     def _zoom(self, t):        
         base.cam.setY(base.cam.getY()+t)
         base.cam.setP(base.cam.getP()+t*3.0)

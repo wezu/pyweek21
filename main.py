@@ -33,8 +33,8 @@ class App():
         builtins.path=path
         
         cfg={'simple-shaders':False,
-             'shadow-size':128,
-             'shadow-area':400,
+             'shadow-size':1024,
+             'shadow-area':50,
              'srgb':True,
              'hardware-skinning':True }
              
@@ -50,6 +50,8 @@ class App():
         cfg['key-jump']=ConfigVariableString('key-jump','space').getValue()
         cfg['key-cut-grass']=ConfigVariableString('key-cut-grass','shift').getValue()
         cfg['key-enter-exit-car']=ConfigVariableString('key-enter-exit-car','tab').getValue()
+        cfg['shadow-size']=ConfigVariableInt('shadow-size',1024).getValue()
+        cfg['shadow-area']=ConfigVariableInt('shadow-area',50).getValue()
              
         builtins.cfg=cfg
         

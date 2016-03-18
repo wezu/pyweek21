@@ -171,7 +171,7 @@ class Grass():
             shader=Shader.load(Shader.SL_GLSL,path+'shaders/cut_count_v.glsl', path+'shaders/cut_count_f.glsl')
             self.one_pixel=self.makeBuffer(shader, size=128)
             self.one_pixel['quad'].setShaderInput('grass', tex(texture))
-            
+            self.one_pixel['buff'].setSort(10)
             
             taskMgr.add(self.update, 'update') 
     

@@ -1,7 +1,7 @@
 'Grass and Gas' PyWeek 21 entry by wezu.
 
 All code is under the CC0 license.
-
+(Look in the 'licence' folder for more details on third party licence)
 
 To run the game:
 -on Windows:
@@ -46,11 +46,14 @@ http://www.freesound.org/people/MarlonHJ/sounds/242740/
 http://www.freesound.org/people/SmiertSpionem/sounds/38556/
 
 Fonts used:
-Let's go Digital Regular by Wolf Lambert 
+Let's go Digital Regular by Wolf Lambert: 
 http://www.fonts2u.com/lets-go-digital-regular.font
+YanoneKaffeesatz-Regular by Yanone: 
+http://www.yanone.de/fonts/kaffeesatz/
 
 Music by:
-'walking music' is 'Night Surfing' by BogStomp :
+'walking music' is 'Night Surfing' by BogStomp:
 https://soundcloud.com/bogstomp/night-surfing
-'driving music' is 'Surf Rocker' by ZSquid :
+'driving music' is 'Surf Rocker' by ZSquid:
 https://soundcloud.com/zsquid/surf-rock-scene-score-demo
+

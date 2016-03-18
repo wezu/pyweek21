@@ -38,15 +38,23 @@ class Game(DirectObject):
         
         self.mode=DRIVING
         
-        # Input
+        #make sure the config is ok
+        cfg['hardware-skinning']=ConfigVariableBool('hardware-skinning', True).getValue()     
+        cfg['srgb']=ConfigVariableBool('framebuffer-srgb', False).getValue()
+        cfg['win-size']=[ConfigVariableInt('win-size', '640 480').getWord(0), ConfigVariableInt('win-size', '640 480').getWord(1)] 
+        cfg['music-volume']=ConfigVariableInt('music-volume', '50').getValue()
+        cfg['sound-volume']=ConfigVariableInt('sound-volume', '100').getValue()
         cfg['key-forward']=ConfigVariableString('key-forward','w').getValue()
         cfg['key-back']=ConfigVariableString('key-back','s').getValue()
         cfg['key-left']=ConfigVariableString('key-left','a').getValue()
         cfg['key-right']=ConfigVariableString('key-right','d').getValue()
         cfg['key-jump']=ConfigVariableString('key-jump','space').getValue()
         cfg['key-cut-grass']=ConfigVariableString('key-cut-grass','shift').getValue()
-        cfg['key-enter-exit-car']
+        cfg['key-enter-exit-car']=ConfigVariableString('key-enter-exit-car','tab').getValue()
+        cfg['shadow-size']=ConfigVariableInt('shadow-size',1024).getValue()
+        cfg['shadow-area']=ConfigVariableInt('shadow-area',50).getValue()
         
+       
         
         self.accept('escape', self.doExit)
         self.accept('f1', self.hideHelp)
@@ -107,6 +115,8 @@ class Game(DirectObject):
         current=self.grass.getStatus()
         if self.grass_to_cut ==0:
             self.grass_to_cut=current
+        if current == 0:   
+            return
         v= (float(current)/float(self.grass_to_cut))
         #print self.grass_to_cut,  current
         self.hud.counter['text']= str(int(v*100.0))+"%"
@@ -130,6 +140,8 @@ class Game(DirectObject):
         self.world.doPhysics(dt, 10, 0.001)
         if self.mode!=EXITING:
             self.camera.follow(node_to_follow, dt, speed)
+            
+        self.sun_sky.sun_node.setPos(self.camera.cam_node.getPos(render))    
         return task.cont
 
     def cleanup(self):
@@ -207,7 +219,7 @@ class Game(DirectObject):
 
         #sky dome
         self.sun_sky=Sky()
-        self.sun_sky.setTime(16.0)
+        self.sun_sky.setTime(17.0)
         
         #terrain
         self.ground=Terrain(self.world, self.worldNP)
@@ -232,9 +244,9 @@ class Game(DirectObject):
         
         #filter manager, post process
         self.filters=Postprocess()        
-        self.filters.setupFxaa() 
+        #self.filters.setupFxaa() 
         #no time to make it work, sorry...
-        #self.filters.setupFilters()
+        self.filters.setupFilters()
         
         
         #map objects .. hardcoded because of time

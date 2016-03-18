@@ -12,7 +12,7 @@ class Car():
                 worldNP,
                 box=Vec3(0.25, 0.9, 0.3),
                 shape_offset=Point3(0, 0.25, 0.4),
-                mass=300.0,
+                mass=600.0,
                 chassis=path+'models/car_chassis',
                 wheel=path+'models/wheel1',
                 wheel_pos=[Point3(0.35, 0.83, 0.35),Point3(-0.35, 0.83, 0.35),Point3( 0.35, -0.32, 0.35),Point3(-0.35, -0.32, 0.35)],
@@ -199,8 +199,8 @@ class Car():
         wheel.setSuspensionStiffness(60.0)
         wheel.setWheelsDampingRelaxation(2.0) #def 2.3
         wheel.setWheelsDampingCompression(2.0) #def 4.4 min 0.1 max 10.0
-        wheel.setFrictionSlip(150.0); #max 5.0 min 1.2
-        wheel.setRollInfluence(0.02)
+        wheel.setFrictionSlip(50.0); #max 5.0 min 1.2
+        wheel.setRollInfluence(0.0)
     
     
     def outOfFuel(self):
@@ -233,13 +233,13 @@ class Car():
             suspension_force+=wheel.getWheelsSuspensionForce()         
         if suspension_force == float('Inf'):
             suspension_force=0.0    
-        if suspension_force>4000:
+        if suspension_force>9000:
             self.playSfx('springs',rate)
-        if suspension_force>5000:
+        if suspension_force>12000:
             self.playSfx('crash6',rate)
-        if suspension_force>8000:
-            self.playSfx('crash5',rate) 
-            self.blade_spining=False             
+        if suspension_force>20000:
+            self.playSfx('crash5',rate)
+            self.blade_spining=False                         
         speed_coef=max(1.0,(100.0-self.vehicle.getCurrentSpeedKmHour()))
         
         if inputState.isSet('forward'):

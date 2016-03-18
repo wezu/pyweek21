@@ -18,7 +18,7 @@ void main()
     {    
     vec4 blured_aux=texture(blurTex,uv);
     vec4 blured_color=texture(blurTex2, uv);
-    float shadow=blured_aux.g*0.5+0.5;
+    float shadow=blured_aux.g*0.3+0.7;
     
     vec4 aux=texture(auxTex, uv);
     float fogfactor=aux.r;    
@@ -30,7 +30,7 @@ void main()
     
     color=mix(color, blured_color, fogfactor);       
     color+=texture(glareTex,uv);//*0.5;         
-    color+=texture(flareTex,vec2(1.0, 1.0)-uv)*texture(starTex, rotate_uv);
+    color+=texture(flareTex,vec2(1.0, 1.0)-uv)*texture(starTex, rotate_uv)*0.5;
     
     //color.rgb = color.rgb / (1.0 + color.rgb);
     //color.rgb = pow(color.rgb, vec3(1.0 / 2.2));  

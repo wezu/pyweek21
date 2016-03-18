@@ -13,9 +13,9 @@ out vec2 texUV;
 out vec2 texUVrepeat;
 out vec4 world_pos;
 
-//uniform float bias;
-//uniform mat4 trans_model_to_clip_of_shadowCamera;
-//out vec4 shadowCoord;
+uniform float bias;
+uniform mat4 trans_model_to_clip_of_shadowCamera;
+out vec4 shadowCoord;
 
 
 void main()
@@ -27,8 +27,8 @@ void main()
     texUVrepeat=p3d_MultiTexCoord0*tex_scale;
         
      // Calculate light-space clip position.
-    //vec4 pushed = p3d_Vertex + vec4(p3d_Normal * bias, 0);
-    //vec4 lightclip = trans_model_to_clip_of_shadowCamera * pushed;
+    vec4 pushed = p3d_Vertex + vec4(p3d_Normal * bias, 0);
+    vec4 lightclip = trans_model_to_clip_of_shadowCamera * pushed;
     // Calculate shadow-map texture coordinates.
-    //shadowCoord = lightclip * vec4(0.5,0.5,0.5,1.0) + lightclip.w * vec4(0.5,0.5,0.5,0.0);    
+    shadowCoord = lightclip * vec4(0.5,0.5,0.5,1.0) + lightclip.w * vec4(0.5,0.5,0.5,0.0);    
     }

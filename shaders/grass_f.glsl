@@ -33,7 +33,7 @@ void main()
         {        
         //vec2 texUV=gl_TexCoord[0].xy; 
         float fog_factor=distance(world_pos.xyz,camera_pos)*0.01;       
-        fog_factor=clamp(pow(fog_factor, 2.0), 0.0, 1.0);
+        fog_factor=clamp(fog_factor, 0.0, 1.0);
         if(fog_factor > 0.99)        
             discard; 
         vec4 color_tex = vec4(0.0,0.0,0.0,0.0);        
@@ -73,9 +73,9 @@ void main()
             
         vec4 final = vec4(color*color_tex.rgb,color_tex.a) ;
         
-        gl_FragData[0] = mix(final,fog ,fog_factor);
+        gl_FragData[0] = mix(final,fog ,fog_factor)*fog_factor;
         gl_FragData[0].a=color_tex.a;
-        //gl_FragData[1]=vec4(fog_factor, 1.0,0.0,0.0);
+        gl_FragData[1]=vec4(fog_factor, 1.0,0.0,0.0);
         }
     }
     

@@ -35,6 +35,6 @@ void main()
     sun=mix(0.0, sun, blend2);
     out_color.a=1.0;
     gl_FragData[0]=out_color;
-    //gl_FragData[1]=vec4(0.0, 1.0,pow(sun*0.9, 5.0),0.5);
+    gl_FragData[1]=vec4(0.0, 1.0,pow(sun*0.9, 5.0),0.5);
     }
 

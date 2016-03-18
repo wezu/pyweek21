@@ -53,7 +53,7 @@ vec3 perturb_normal( vec3 N, vec3 V, vec2 texcoord )
 void main()
     {    
     float fog_factor=distance(world_pos.xyz,camera_pos)*0.01;        
-    fog_factor=clamp(pow(fog_factor, 2.0), 0.0, 1.0);
+    fog_factor=clamp(fog_factor, 0.0, 1.0);
     
     vec3 color=vec3(0.0, 0.0, 0.0);
     vec4 color_map=texture(p3d_Texture0,uv);
@@ -95,12 +95,12 @@ void main()
     //color+=(texture(cubemap, R.xzy).rgb)*gloss*3.0;
     vec4 final= vec4(color.rgb * color_map.xyz, color_map.a);
     //gl_FragData[0]= texture(cubemap, skyR.xzy);
-    gl_FragData[0] = mix(final ,fog_color, fog_factor);     
+    gl_FragData[0] = mix(final ,fog_color, fog_factor*fog_factor);     
     //shadows
     //vec4 shadowUV = shadowCoord / shadowCoord.q;
     //float shadowColor = texture(shadow, shadowUV.xy).r;    
     //float shade = 1.0;
-    //if (shadowColor < shadowUV.z-0.005)
+    //if (shadowColor < shadowUV.z-0.01)
     //   shade=fog_factor;        
-    //gl_FragData[1]=vec4(fog_factor, shade, shade*specular*(1.0-fog_factor),0.0);
+    gl_FragData[1]=vec4(fog_factor, 0.0, 0.5*specular*(1.0-fog_factor),0.0);
     }

@@ -7,20 +7,24 @@ from toolkit import *
 
 class Character():
     def __init__(self, world, worldNP):
+        
+        self.move_force=60000
+        self.jump_force=20000
+        self.mass=50.0
         self.flying_time=0.0
-        radius = 0.3
         #shape = BulletSphereShape(radius)
         shape =BulletCapsuleShape(0.15, 0.6, ZUp)
         self.node = worldNP.attachNewNode(BulletRigidBodyNode('Sphere'))
-        self.node.node().setMass(50.0)
+        self.node.node().setMass(self.mass)
         self.node.node().addShape(shape)        
         self.node.setCollideMask(BitMask32.allOn())
-        self.node.node().setFriction(1.0)
+        self.node.node().setFriction(1.2)
         self.node.node().setAngularDamping(1.0)
         #self.node.node().setLinearDamping(0.5)
         self.node.node().setDeactivationEnabled(False)
-        world.attachRigidBody(self.node.node())
-    
+        self.node.node().setCcdMotionThreshold(1e-7)
+        self.node.node().setCcdSweptSphereRadius(0.15)        
+        world.attachRigidBody(self.node.node())    
         self.actor_node =render.attachNewNode('actor_node')    
         self.actor=Actor(path+'models/m_rocket',
                         {'walk':path+'models/a_rocket_walk1',
@@ -69,7 +73,7 @@ class Character():
         self.hide()
     
     def _resetMass(self):
-        self.node.node().setMass(50.0)
+        self.node.node().setMass(self.mass)
         
     def exitCar(self, node):        
         pos=node.getPos(render)
@@ -99,9 +103,9 @@ class Character():
             
     def jump(self):
         if self.isOnGround():
-            force = self.actor_node.getRelativeVector(render, self.physic_node.getLinearVelocity())*1000.0
+            force = self.actor_node.getRelativeVector(render, self.physic_node.getLinearVelocity())*self.move_force*0.01
             #print force   
-            force += Vec3(0, 0, 20000.0)
+            force += Vec3(0, 0, self.jump_force)
             force = render.getRelativeVector(self.actor_node, force)
             self.physic_node.applyCentralForce(force)
             self.actor.play('jump')
@@ -115,14 +119,14 @@ class Character():
         force = Vec3(0, 0, 0.0)
         if self.flying_time>0.4 and self.actor.getCurrentAnim()!='jump':
             self.actor.pose('jump', 20)
-        if self.flying_time>2.0:
+        if self.flying_time>3.0:
             print "reset!"
-            Sequence(Wait(0.5), Func(self._resetMass)).start()
+            Sequence(Wait(0.1), Func(self._resetMass)).start()
             self.node.node().setMass(0.0)
-            self.node.setPos(self.last_know_ground_pos)
-            self.node.setZ(self.node.getZ(render)+1.0)
-            self.node.setY(self.node.getY(render)+1.0)
-            self.physic_node.setLinearVelocity(Vec3(0,0,0))
+            self.node.setPos(self.last_know_ground_pos) # this should work...
+            self.node.setZ(self.node.getZ(render)+1.0) #wrong some times
+            self.node.setY(self.node.getY(render)+1.0) #this may be wrong
+            self.physic_node.setLinearVelocity(Vec3(0,0,0))#is this needed?
             self.flying_time=0.0
             return       
         if self.isOnGround():
@@ -131,20 +135,20 @@ class Character():
                 self.physic_node.setLinearVelocity(Vec3(0,0,0))  
             self.flying_time=0.0            
             if self.actor.getCurrentAnim() not in ('jump', 'recover'):
-                if speed.y>4.0:
+                if speed.y>3.5:
                     if self.actor.getCurrentAnim()!= 'run':
                         self.actor.loop('run')
                     self.actor.setPlayRate((speed.y*0.5)-1.0,'run')
                 else:   
                     if self.actor.getCurrentAnim()!= 'walk':
                         self.actor.loop('walk')  
-                    self.actor.setPlayRate((speed.y*0.8),'walk')            
+                    self.actor.setPlayRate((speed.y*0.7),'walk')            
             if self.actor.getCurrentAnim()!='recover':                             
                 #if inputState.isSet('run'): v = 75 *dt            
                 if inputState.isSet('forward'):
-                    force.setY(60000.0*dt*speed_co) 
+                    force.setY(self.move_force*dt*speed_co) 
                 if inputState.isSet('reverse'):
-                    force.setY(-40000.0*dt*speed_co)
+                    force.setY(-0.5*self.move_force*dt*speed_co)
                 if inputState.isSet('turnLeft'):
                     self.actor_node.setH(self.actor_node, 90.0*dt)
                 if inputState.isSet('turnRight'):
@@ -155,12 +159,12 @@ class Character():
         else:
             self.flying_time+=dt    
             if inputState.isSet('forward'):
-                force.setY(10000.0*dt) 
+                force.setY(0.2*self.move_force*dt) 
             if inputState.isSet('reverse'):
-                force.setY(-10000.0*dt)
+                force.setY(-0.2*self.move_force*dt)
             if inputState.isSet('turnLeft'):
-                force.setX(-10000.0*dt)
+                force.setX(-0.2*self.move_force*dt)
             if inputState.isSet('turnRight'):
-                force.setX(10000.0*dt)
+                force.setX(0.2*self.move_force*dt)
         force = render.getRelativeVector(self.actor_node, force)    
         self.physic_node.applyCentralForce(force) 
