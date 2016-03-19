@@ -9,7 +9,7 @@ uniform float osg_FrameTime;
 uniform mat4 p3d_ModelViewProjectionMatrix;
 uniform mat4 p3d_ModelViewMatrix;
 //uniform mat4 p3d_ModelMatrixInverseTranspose;
-uniform mat4 tpose_model_to_world; //pre 1.10 cg-style input
+uniform mat4 tpose_world_to_model; //pre 1.10 cg-style input
 uniform mat4 p3d_ModelMatrix;
 uniform sampler2D height;
 uniform sampler2D grass;
@@ -32,7 +32,7 @@ void main()
     uv=vec2(v.x*0.001953125, v.y*0.001953125)+uv_offset;    
     vec4 blend_mask=textureLod(grass,uv, 0.0); 
     blend_mask -=textureLod(cut,uv, 0.0).r; 
-    normal = (tpose_model_to_world * vec4(p3d_Normal, 0.0)).xyz;
+    normal = (tpose_world_to_model * vec4(p3d_Normal, 0.0)).xyz;
     
     if(dot(blend_mask.rgb, vec3(1.0, 1.0, 1.0)) < 0.1)        
         gl_Position=vec4(0.0,0.0,0.0,0.0);

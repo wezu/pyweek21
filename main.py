@@ -15,6 +15,7 @@ except IOError:
         print "No config file, using default"   
 loadPrcFileData("", "window-type none")
 loadPrcFileData("", "textures-power-2 None")        
+loadPrcFileData("", "framebuffer-srgb True")        
 from panda3d.core import *
 from direct.showbase import ShowBase
 import sys

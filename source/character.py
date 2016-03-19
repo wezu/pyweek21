@@ -38,7 +38,7 @@ class Character():
         self.actor.setH(180)
         self.actor.setZ(-0.45)
         self.actor.reparentTo(self.actor_node)  
-        self.actor.setBlend(frameBlend = True)
+        self.actor.setBlend(frameBlend = True)        
         if cfg['hardware-skinning']:  
             attr = ShaderAttrib.make(Shader.load(Shader.SLGLSL, path+'shaders/actor_v.glsl', path+'shaders/default_f.glsl'))
             attr = attr.setFlag(ShaderAttrib.F_hardware_skinning, True)

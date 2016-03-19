@@ -55,12 +55,13 @@ class Terrain():
             tex_format=new_tex.getFormat()  
             if tex_format==Texture.F_rgb:
                 tex_format=Texture.F_srgb
-            elif tex_format==Texture.F_rgba:
+            elif tex_format==Texture.F_rgba or Texture.F_rgbm:
                 tex_format=Texture.F_srgb_alpha   
             new_tex.setFormat(tex_format)  
-        #print "stage=", stage    
-        #print "texture=", texture
-        #print "new_tex=", new_tex
+            print "tex_format=",tex_format
+        print "stage=", stage    
+        print "texture=", texture
+        #print "new_tex=", new_tex        
         #print "findTextureStage=", self.mesh.findTextureStage(stage)
         #print self.mesh.findAllTextureStages()
         new_tex.setMinfilter(Texture.FTLinearMipmapLinear)
@@ -82,4 +83,4 @@ class Terrain():
         self.mesh.setTransparency(TransparencyAttrib.MNone, 1)
         self.mesh.node().setBounds(OmniBoundingVolume())
         self.mesh.node().setFinal(1)
-        self.mesh.setBin("background", 11)
+        #self.mesh.setBin("background", 11)

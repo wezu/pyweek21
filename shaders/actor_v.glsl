@@ -4,7 +4,7 @@ uniform mat4 p3d_ModelViewProjectionMatrix;
 uniform mat4 p3d_ModelViewMatrix;
 uniform mat4 p3d_ModelMatrix;
 //uniform mat4 p3d_ModelMatrixInverseTranspose;
-uniform mat4 tpose_model_to_world; //pre 1.10 cg-style input
+uniform mat4 tpose_world_to_model; //pre 1.10 cg-style input
 
 
 in vec3 p3d_Normal;
@@ -37,7 +37,7 @@ void main()
     //workaround for driver crash
     mat3 matrix3=mat3(matrix);   
     normal=matrix3*p3d_Normal;  
-    normal = (tpose_model_to_world * vec4(normal, 0.0)).xyz;
+    normal = (tpose_world_to_model * vec4(normal, 0.0)).xyz;
     
 
     uv=p3d_MultiTexCoord0;

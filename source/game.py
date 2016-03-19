@@ -335,4 +335,5 @@ class Game(DirectObject):
         self.driving_music.play()
         self.walking_music=loader.loadMusic(path+'music/walking.ogg')
         self.walking_music.setLoop(True) 
-
+        
+        print self.char.actor.getScale(render)    
